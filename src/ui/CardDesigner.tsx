@@ -6,12 +6,15 @@ import {
   STATUS_OPTIONS,
   SELECTOR_OPTIONS,
   TRIGGER_OPTIONS,
+  formatBudgetValue,
+  getAbilityBudgetSummary,
+  getDraftBudgetSummary,
   cardToDraft,
   collectUsedTerms,
   createBlankCardDraft,
   createDefaultEffect,
-  draftToCard,
   ensureDraftId,
+  getEffectBudgetCost,
   getDraftPreview,
   getTokenOptions,
   type CardDraft,
@@ -164,6 +167,16 @@ export function CardDesigner({ seedCard }: CardDesignerProps) {
 
   const preview = useMemo(() => getDraftPreview(ensureDraftId(draft), normalizeTerms(termOverrides)), [draft, termOverrides]);
   const usedTerms = useMemo(() => collectUsedTerms(preview.card), [preview.card]);
+  const budget = useMemo(() => getDraftBudgetSummary(draft), [draft]);
+  const defaultEffectCost = useMemo(() => getEffectBudgetCost(createDefaultEffect()), []);
+  const defaultAbilityCost = useMemo(
+    () =>
+      getAbilityBudgetSummary({
+        trigger: "onPlay",
+        effects: [createDefaultEffect()]
+      }).totalCost,
+    []
+  );
 
   useEffect(() => {
     writeStorage(DRAFT_STORAGE_KEY, draft);
@@ -200,6 +213,10 @@ export function CardDesigner({ seedCard }: CardDesignerProps) {
   }
 
   function saveCurrentDesign() {
+    if (!budget.withinBudget) {
+      return;
+    }
+
     const saved: SavedCardDesign = {
       id: preview.card.id,
       card: structuredClone(preview.card),
@@ -240,6 +257,9 @@ export function CardDesigner({ seedCard }: CardDesignerProps) {
           </div>
           <div className="designer-collapsed__meta">
             <span>{usedTerms.length} semantic terms in use</span>
+            <span>
+              Budget {formatBudgetValue(budget.totalCost)} / {formatBudgetValue(budget.maxBudget)}
+            </span>
             <span>{savedDesigns.length} saved design{savedDesigns.length === 1 ? "" : "s"}</span>
           </div>
         </div>
@@ -271,9 +291,39 @@ export function CardDesigner({ seedCard }: CardDesignerProps) {
             >
               Reset Draft
             </button>
-            <button type="button" className="primary-button" onClick={saveCurrentDesign}>
+            <button type="button" className="primary-button" onClick={saveCurrentDesign} disabled={!budget.withinBudget}>
               Save Design
             </button>
+          </div>
+
+          <div className={`designer-budget${budget.withinBudget ? "" : " is-over"}`}>
+            <div className="designer-budget__summary">
+              <div className="designer-budget__chip">
+                <span>Cap</span>
+                <strong>{formatBudgetValue(budget.maxBudget)}</strong>
+              </div>
+              <div className="designer-budget__chip">
+                <span>Chassis</span>
+                <strong>{formatBudgetValue(budget.chassisCost)}</strong>
+              </div>
+              <div className="designer-budget__chip">
+                <span>Abilities</span>
+                <strong>{formatBudgetValue(budget.abilityCost)}</strong>
+              </div>
+              <div className="designer-budget__chip">
+                <span>{budget.withinBudget ? "Remaining" : "Over"}</span>
+                <strong>{formatBudgetValue(Math.abs(budget.remainingBudget))}</strong>
+              </div>
+            </div>
+            <div className="designer-budget__note">
+              Mana cost buys build budget. Unit stats spend some of it, then every trigger/effect combination draws from the
+              rest.
+            </div>
+            {!budget.withinBudget ? (
+              <div className="designer-budget__warning">
+                This draft is over budget. Raise cost, trim stats, or remove expensive effects before saving.
+              </div>
+            ) : null}
           </div>
 
           <div className="designer-grid">
@@ -403,8 +453,9 @@ export function CardDesigner({ seedCard }: CardDesignerProps) {
                     ]
                   }))
                 }
+                disabled={budget.remainingBudget < defaultAbilityCost}
               >
-                Add Ability
+                Add Ability ({formatBudgetValue(defaultAbilityCost)})
               </button>
             </div>
 
@@ -430,23 +481,34 @@ export function CardDesigner({ seedCard }: CardDesignerProps) {
                         ))}
                       </select>
                     </label>
-                    <button
-                      type="button"
-                      className="secondary-button"
-                      onClick={() =>
-                        updateDraft((current) => ({
-                          ...current,
-                          abilities: current.abilities.filter((_, index) => index !== abilityIndex)
-                        }))
-                      }
-                      disabled={draft.abilities.length === 1}
-                    >
-                      Remove Ability
-                    </button>
+                    <div className="designer-inline-actions">
+                      <span className="designer-budget-pill">
+                        Budget {formatBudgetValue(budget.abilities[abilityIndex]?.totalCost ?? 0)}
+                      </span>
+                      <button
+                        type="button"
+                        className="secondary-button"
+                        onClick={() =>
+                          updateDraft((current) => ({
+                            ...current,
+                            abilities: current.abilities.filter((_, index) => index !== abilityIndex)
+                          }))
+                        }
+                        disabled={draft.abilities.length === 1}
+                      >
+                        Remove Ability
+                      </button>
+                    </div>
                   </div>
 
                   {ability.effects.map((effect, effectIndex) => (
                     <div key={`effect-${abilityIndex}-${effectIndex}`} className="designer-effect">
+                      <div className="designer-effect__header">
+                        <strong>{budget.abilities[abilityIndex]?.effects[effectIndex]?.label ?? "Effect"}</strong>
+                        <span className="designer-budget-pill">
+                          Cost {formatBudgetValue(budget.abilities[abilityIndex]?.effects[effectIndex]?.cost ?? 0)}
+                        </span>
+                      </div>
                       <div className="designer-grid designer-grid--tight">
                         <label className="designer-field">
                           <span>Effect</span>
@@ -622,8 +684,9 @@ export function CardDesigner({ seedCard }: CardDesignerProps) {
                         effects: [...current.effects, createDefaultEffect()]
                       }))
                     }
+                    disabled={budget.remainingBudget < defaultEffectCost}
                   >
-                    Add Effect
+                    Add Effect ({formatBudgetValue(defaultEffectCost)})
                   </button>
                 </article>
               ))}
@@ -681,6 +744,49 @@ export function CardDesigner({ seedCard }: CardDesignerProps) {
                   {preview.rules.map((rule) => (
                     <div key={rule}>{rule}</div>
                   ))}
+                </div>
+              </div>
+            </div>
+
+            <div className="designer-preview__block">
+              <strong>Budget Ledger</strong>
+              <div className="designer-budget-ledger">
+                <div className="designer-budget-ledger__row">
+                  <span>Budget cap</span>
+                  <strong>{formatBudgetValue(budget.maxBudget)}</strong>
+                </div>
+                {draft.kind === "unit" ? (
+                  <div className="designer-budget-ledger__row">
+                    <span>Unit chassis</span>
+                    <strong>{formatBudgetValue(budget.chassisCost)}</strong>
+                  </div>
+                ) : null}
+                {budget.abilities.map((abilityBudget, abilityIndex) => (
+                  <div key={`ability-budget-${abilityIndex}`} className="designer-budget-ledger__group">
+                    <div className="designer-budget-ledger__row designer-budget-ledger__row--group">
+                      <span>
+                        Ability {abilityIndex + 1}: {abilityBudget.trigger}
+                      </span>
+                      <strong>{formatBudgetValue(abilityBudget.totalCost)}</strong>
+                    </div>
+                    <div className="designer-budget-ledger__row designer-budget-ledger__row--nested">
+                      <span>Trigger tax</span>
+                      <strong>{formatBudgetValue(abilityBudget.triggerCost)}</strong>
+                    </div>
+                    {abilityBudget.effects.map((effectBudget, effectIndex) => (
+                      <div
+                        key={`effect-budget-${abilityIndex}-${effectIndex}`}
+                        className="designer-budget-ledger__row designer-budget-ledger__row--nested"
+                      >
+                        <span>{effectBudget.label}</span>
+                        <strong>{formatBudgetValue(effectBudget.cost)}</strong>
+                      </div>
+                    ))}
+                  </div>
+                ))}
+                <div className="designer-budget-ledger__row designer-budget-ledger__row--total">
+                  <span>{budget.withinBudget ? "Remaining" : "Over budget"}</span>
+                  <strong>{formatBudgetValue(Math.abs(budget.remainingBudget))}</strong>
                 </div>
               </div>
             </div>

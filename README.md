@@ -70,6 +70,7 @@ Right now the duel is fully wired into the live engine. The larger multiplayer l
 - Newly played units visibly show `Summoning sickness` during the turn where they cannot attack.
 - The end-turn control is labeled to make it clearer that combat resolves immediately afterward.
 - The card designer starts collapsed so the match UI stays focused until you explicitly open the tool.
+- The card designer now enforces a build-budget system: mana cost buys a budget cap, unit stats consume part of it, and every trigger/effect package has a visible spend.
 - The landing screen keeps the duel flow stable while also letting you inspect future multiplayer topologies.
 
 ## Topology And Ritual Concepts

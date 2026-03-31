@@ -580,6 +580,56 @@ button {
   gap: 12px;
 }
 
+.designer-budget,
+.designer-budget-ledger {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.designer-budget {
+  padding: 16px;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.designer-budget.is-over {
+  border-color: rgba(255, 123, 90, 0.4);
+  background: rgba(255, 123, 90, 0.08);
+}
+
+.designer-budget__summary {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 10px;
+}
+
+.designer-budget__chip,
+.designer-budget-pill {
+  padding: 10px 12px;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.designer-budget__chip {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.designer-budget__chip span,
+.designer-budget__note,
+.designer-budget-ledger__row span {
+  color: #d9cfbf;
+}
+
+.designer-budget__warning {
+  color: #ffd0c4;
+  font-weight: 600;
+}
+
 .designer-grid--tight {
   grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
 }
@@ -632,6 +682,20 @@ button {
   gap: 12px;
 }
 
+.designer-effect__header,
+.designer-inline-actions {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.designer-budget-pill {
+  color: #ffe5b4;
+  font-size: 0.84rem;
+}
+
 .designer-filters {
   display: flex;
   flex-wrap: wrap;
@@ -669,6 +733,43 @@ button {
   flex-direction: column;
   gap: 8px;
   color: #f1e8d9;
+}
+
+.designer-budget-ledger {
+  padding: 14px;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.designer-budget-ledger__group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.designer-budget-ledger__row {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  align-items: baseline;
+}
+
+.designer-budget-ledger__row--group {
+  padding-top: 8px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.designer-budget-ledger__row--nested {
+  padding-left: 12px;
+  font-size: 0.94rem;
+}
+
+.designer-budget-ledger__row--total {
+  margin-top: 6px;
+  padding-top: 10px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  color: #fff0cc;
 }
 
 .saved-designs {
