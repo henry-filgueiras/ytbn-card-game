@@ -157,6 +157,7 @@ function normalizeTerms(terms: TermOverrides): TermOverrides {
 }
 
 export function CardDesigner({ seedCard }: CardDesignerProps) {
+  const [isOpen, setIsOpen] = useState(false);
   const [draft, setDraft] = useState<CardDraft>(() => readStorage(DRAFT_STORAGE_KEY, createBlankCardDraft()));
   const [termOverrides, setTermOverrides] = useState<TermOverrides>(() => readStorage(TERMS_STORAGE_KEY, {}));
   const [savedDesigns, setSavedDesigns] = useState<SavedCardDesign[]>(() => readStorage(SAVED_STORAGE_KEY, []));
@@ -215,499 +216,527 @@ export function CardDesigner({ seedCard }: CardDesignerProps) {
     <section className="designer-panel">
       <div className="inspector__header">
         <h2>Card Designer</h2>
-        <span>Compose semantic payloads, then preview canonical language and card text.</span>
+        <div className="designer-panel__header-actions">
+          <span>{isOpen ? "Compose payloads and tune terms." : "Collapsed by default to keep gameplay in focus."}</span>
+          <button type="button" className="secondary-button" onClick={() => setIsOpen((current) => !current)}>
+            {isOpen ? "Collapse Designer" : "Open Designer"}
+          </button>
+        </div>
       </div>
 
-      <div className="designer-toolbar">
-        <button
-          type="button"
-          className="secondary-button"
-          onClick={() => {
-            if (!seedCard) {
-              return;
-            }
-
-            setDraft(cardToDraft(seedCard));
-            setTermOverrides({});
-          }}
-          disabled={!seedCard}
-        >
-          Use Inspected Card
-        </button>
-        <button
-          type="button"
-          className="secondary-button"
-          onClick={() => {
-            setDraft(createBlankCardDraft());
-            setTermOverrides({});
-          }}
-        >
-          Reset Draft
-        </button>
-        <button type="button" className="primary-button" onClick={saveCurrentDesign}>
-          Save Design
-        </button>
-      </div>
-
-      <div className="designer-grid">
-        <label className="designer-field">
-          <span>Card ID</span>
-          <input
-            value={draft.id}
-            onChange={(event) =>
-              updateDraft((current) => ({
-                ...current,
-                id: event.target.value
-              }))
-            }
-          />
-        </label>
-        <label className="designer-field">
-          <span>Name</span>
-          <input
-            value={draft.name}
-            onChange={(event) =>
-              updateDraft((current) => ({
-                ...current,
-                name: event.target.value
-              }))
-            }
-          />
-        </label>
-        <label className="designer-field">
-          <span>Kind</span>
-          <select
-            value={draft.kind}
-            onChange={(event) =>
-              updateDraft((current) => ({
-                ...current,
-                kind: event.target.value as CardDraft["kind"]
-              }))
-            }
-          >
-            <option value="unit">Unit</option>
-            <option value="spell">Spell</option>
-          </select>
-        </label>
-        <label className="designer-field">
-          <span>Faction</span>
-          <select
-            value={draft.faction}
-            onChange={(event) =>
-              updateDraft((current) => ({
-                ...current,
-                faction: event.target.value as CardDraft["faction"]
-              }))
-            }
-          >
-            {FACTION_OPTIONS.map((faction) => (
-              <option key={faction} value={faction}>
-                {faction}
-              </option>
+      {!isOpen ? (
+        <div className="designer-collapsed">
+          <div>
+            <strong>{preview.card.name}</strong>
+            <div className="card-view__meta">
+              {preview.card.kind === "unit" ? `${preview.card.attack}/${preview.card.health} unit` : "spell"} · cost{" "}
+              {preview.card.cost} · {preview.card.id}
+            </div>
+          </div>
+          <div className="designer-collapsed__syntax">
+            {preview.canonicalRules.map((rule) => (
+              <div key={rule}>{rule}</div>
             ))}
-          </select>
-        </label>
-        <label className="designer-field">
-          <span>Cost</span>
-          <input
-            type="number"
-            min={0}
-            max={12}
-            value={draft.cost}
-            onChange={(event) =>
-              updateDraft((current) => ({
-                ...current,
-                cost: Number(event.target.value)
-              }))
-            }
-          />
-        </label>
-        {draft.kind === "unit" ? (
-          <>
+          </div>
+          <div className="designer-collapsed__meta">
+            <span>{usedTerms.length} semantic terms in use</span>
+            <span>{savedDesigns.length} saved design{savedDesigns.length === 1 ? "" : "s"}</span>
+          </div>
+        </div>
+      ) : (
+        <>
+          <div className="designer-toolbar">
+            <button
+              type="button"
+              className="secondary-button"
+              onClick={() => {
+                if (!seedCard) {
+                  return;
+                }
+
+                setDraft(cardToDraft(seedCard));
+                setTermOverrides({});
+              }}
+              disabled={!seedCard}
+            >
+              Use Inspected Card
+            </button>
+            <button
+              type="button"
+              className="secondary-button"
+              onClick={() => {
+                setDraft(createBlankCardDraft());
+                setTermOverrides({});
+              }}
+            >
+              Reset Draft
+            </button>
+            <button type="button" className="primary-button" onClick={saveCurrentDesign}>
+              Save Design
+            </button>
+          </div>
+
+          <div className="designer-grid">
             <label className="designer-field">
-              <span>Attack</span>
+              <span>Card ID</span>
+              <input
+                value={draft.id}
+                onChange={(event) =>
+                  updateDraft((current) => ({
+                    ...current,
+                    id: event.target.value
+                  }))
+                }
+              />
+            </label>
+            <label className="designer-field">
+              <span>Name</span>
+              <input
+                value={draft.name}
+                onChange={(event) =>
+                  updateDraft((current) => ({
+                    ...current,
+                    name: event.target.value
+                  }))
+                }
+              />
+            </label>
+            <label className="designer-field">
+              <span>Kind</span>
+              <select
+                value={draft.kind}
+                onChange={(event) =>
+                  updateDraft((current) => ({
+                    ...current,
+                    kind: event.target.value as CardDraft["kind"]
+                  }))
+                }
+              >
+                <option value="unit">Unit</option>
+                <option value="spell">Spell</option>
+              </select>
+            </label>
+            <label className="designer-field">
+              <span>Faction</span>
+              <select
+                value={draft.faction}
+                onChange={(event) =>
+                  updateDraft((current) => ({
+                    ...current,
+                    faction: event.target.value as CardDraft["faction"]
+                  }))
+                }
+              >
+                {FACTION_OPTIONS.map((faction) => (
+                  <option key={faction} value={faction}>
+                    {faction}
+                  </option>
+                ))}
+              </select>
+            </label>
+            <label className="designer-field">
+              <span>Cost</span>
               <input
                 type="number"
                 min={0}
                 max={12}
-                value={draft.attack}
+                value={draft.cost}
                 onChange={(event) =>
                   updateDraft((current) => ({
                     ...current,
-                    attack: Number(event.target.value)
+                    cost: Number(event.target.value)
                   }))
                 }
               />
             </label>
-            <label className="designer-field">
-              <span>Health</span>
-              <input
-                type="number"
-                min={1}
-                max={16}
-                value={draft.health}
-                onChange={(event) =>
-                  updateDraft((current) => ({
-                    ...current,
-                    health: Number(event.target.value)
-                  }))
-                }
-              />
-            </label>
-          </>
-        ) : null}
-      </div>
-
-      <div className="designer-section">
-        <div className="designer-section__header">
-          <h3>Abilities</h3>
-          <button
-            type="button"
-            className="secondary-button"
-            onClick={() =>
-              updateDraft((current) => ({
-                ...current,
-                abilities: [
-                  ...current.abilities,
-                  {
-                    trigger: "onPlay",
-                    effects: [createDefaultEffect()]
-                  }
-                ]
-              }))
-            }
-          >
-            Add Ability
-          </button>
-        </div>
-
-        <div className="designer-abilities">
-          {draft.abilities.map((ability, abilityIndex) => (
-            <article key={`ability-${abilityIndex}`} className="designer-ability">
-              <div className="designer-section__header">
+            {draft.kind === "unit" ? (
+              <>
                 <label className="designer-field">
-                  <span>Trigger</span>
-                  <select
-                    value={ability.trigger}
+                  <span>Attack</span>
+                  <input
+                    type="number"
+                    min={0}
+                    max={12}
+                    value={draft.attack}
                     onChange={(event) =>
-                      updateAbility(abilityIndex, (current) => ({
+                      updateDraft((current) => ({
                         ...current,
-                        trigger: event.target.value as typeof current.trigger
+                        attack: Number(event.target.value)
                       }))
                     }
-                  >
-                    {TRIGGER_OPTIONS.map((trigger) => (
-                      <option key={trigger} value={trigger}>
-                        {trigger}
-                      </option>
-                    ))}
-                  </select>
+                  />
                 </label>
-                <button
-                  type="button"
-                  className="secondary-button"
-                  onClick={() =>
-                    updateDraft((current) => ({
-                      ...current,
-                      abilities: current.abilities.filter((_, index) => index !== abilityIndex)
-                    }))
-                  }
-                  disabled={draft.abilities.length === 1}
-                >
-                  Remove Ability
-                </button>
-              </div>
+                <label className="designer-field">
+                  <span>Health</span>
+                  <input
+                    type="number"
+                    min={1}
+                    max={16}
+                    value={draft.health}
+                    onChange={(event) =>
+                      updateDraft((current) => ({
+                        ...current,
+                        health: Number(event.target.value)
+                      }))
+                    }
+                  />
+                </label>
+              </>
+            ) : null}
+          </div>
 
-              {ability.effects.map((effect, effectIndex) => (
-                <div key={`effect-${abilityIndex}-${effectIndex}`} className="designer-effect">
-                  <div className="designer-grid designer-grid--tight">
-                    <label className="designer-field">
-                      <span>Effect</span>
-                      <select
-                        value={effect.kind}
-                        onChange={(event) =>
-                          updateEffect(abilityIndex, effectIndex, () => createDefaultEffect(event.target.value as Effect["kind"]))
-                        }
-                      >
-                        {EFFECT_OPTIONS.map((effectKind) => (
-                          <option key={effectKind} value={effectKind}>
-                            {effectKind}
-                          </option>
-                        ))}
-                      </select>
-                    </label>
-
-                    {"amount" in effect ? (
-                      <label className="designer-field">
-                        <span>Amount</span>
-                        <input
-                          type="number"
-                          value={effect.amount}
-                          onChange={(event) =>
-                            updateEffect(abilityIndex, effectIndex, (current) => ({
-                              ...current,
-                              amount: Number(event.target.value)
-                            }))
-                          }
-                        />
-                      </label>
-                    ) : null}
-
-                    {effect.kind === "grantStatus" ? (
-                      <label className="designer-field">
-                        <span>Status</span>
-                        <select
-                          value={effect.status}
-                          onChange={(event) =>
-                            updateEffect(abilityIndex, effectIndex, (current) => ({
-                              ...current,
-                              status: event.target.value as typeof effect.status
-                            }))
-                          }
-                        >
-                          {STATUS_OPTIONS.map((status) => (
-                            <option key={status} value={status}>
-                              {status}
-                            </option>
-                          ))}
-                        </select>
-                      </label>
-                    ) : null}
-
-                    {effect.kind === "summonToken" ? (
-                      <>
-                        <label className="designer-field">
-                          <span>Token</span>
-                          <select
-                            value={effect.tokenCardId}
-                            onChange={(event) =>
-                              updateEffect(abilityIndex, effectIndex, (current) => ({
-                                ...current,
-                                tokenCardId: event.target.value
-                              }))
-                            }
-                          >
-                            {getTokenOptions().map((token) => (
-                              <option key={token.id} value={token.id}>
-                                {token.label}
-                              </option>
-                            ))}
-                          </select>
-                        </label>
-                        <label className="designer-field">
-                          <span>Summon Position</span>
-                          <select
-                            value={effect.position}
-                            onChange={(event) =>
-                              updateEffect(abilityIndex, effectIndex, (current) => ({
-                                ...current,
-                                position: event.target.value as typeof effect.position
-                              }))
-                            }
-                          >
-                            <option value="firstEmpty">First empty lane</option>
-                            <option value="sameLane">Same lane</option>
-                          </select>
-                        </label>
-                      </>
-                    ) : null}
-
-                    {hasTarget(effect) ? (
-                      <label className="designer-field">
-                        <span>Selector</span>
-                        <select
-                          value={effect.target.selector}
-                          onChange={(event) =>
-                            updateEffect(abilityIndex, effectIndex, (current) =>
-                              hasTarget(current)
-                                ? {
-                                    ...current,
-                                    target: {
-                                      ...current.target,
-                                      selector: event.target.value as typeof current.target.selector
-                                    }
-                                  }
-                                : current
-                            )
-                          }
-                        >
-                          {SELECTOR_OPTIONS.map((selector) => (
-                            <option key={selector} value={selector}>
-                              {selector}
-                            </option>
-                          ))}
-                        </select>
-                      </label>
-                    ) : null}
-                  </div>
-
-                    {hasTarget(effect) ? (
-                      <div className="designer-filters">
-                        {FILTER_OPTIONS.map((filter) => (
-                          <label key={filter} className="designer-checkbox">
-                            <input
-                              type="checkbox"
-                              checked={effect.target.filters?.includes(filter) ?? false}
-                              onChange={(event) =>
-                              updateEffect(abilityIndex, effectIndex, (current) =>
-                                hasTarget(current)
-                                  ? {
-                                      ...current,
-                                      target: {
-                                        ...current.target,
-                                        filters: updateTargetFilters(current.target.filters, filter, event.target.checked)
-                                      }
-                                    }
-                                  : current
-                              )
-                              }
-                            />
-                            <span>{filter}</span>
-                        </label>
-                      ))}
-                    </div>
-                  ) : null}
-
-                  <div className="designer-effect__actions">
-                    <button
-                      type="button"
-                      className="secondary-button"
-                      onClick={() =>
-                        updateAbility(abilityIndex, (current) => ({
-                          ...current,
-                          effects: current.effects.filter((_, index) => index !== effectIndex)
-                        }))
-                      }
-                      disabled={ability.effects.length === 1}
-                    >
-                      Remove Effect
-                    </button>
-                  </div>
-                </div>
-              ))}
-
+          <div className="designer-section">
+            <div className="designer-section__header">
+              <h3>Abilities</h3>
               <button
                 type="button"
                 className="secondary-button"
                 onClick={() =>
-                  updateAbility(abilityIndex, (current) => ({
+                  updateDraft((current) => ({
                     ...current,
-                    effects: [...current.effects, createDefaultEffect()]
+                    abilities: [
+                      ...current.abilities,
+                      {
+                        trigger: "onPlay",
+                        effects: [createDefaultEffect()]
+                      }
+                    ]
                   }))
                 }
               >
-                Add Effect
+                Add Ability
               </button>
-            </article>
-          ))}
-        </div>
-      </div>
+            </div>
 
-      <div className="designer-section">
-        <div className="designer-section__header">
-          <h3>Term Overrides</h3>
-          <span>Rename only the semantic pieces this draft actually uses.</span>
-        </div>
-        {usedTerms.length > 0 ? (
-          <div className="designer-grid">
-            {usedTerms.map((entry) => (
-              <label key={`${entry.category}-${entry.key}`} className="designer-field">
-                <span>
-                  {entry.category}: {entry.label}
-                </span>
-                <input
-                  placeholder={entry.label}
-                  value={getTermValue(termOverrides, entry)}
-                  onChange={(event) => setTermOverrides((current) => setTermValue(current, entry, event.target.value))}
-                />
-              </label>
-            ))}
+            <div className="designer-abilities">
+              {draft.abilities.map((ability, abilityIndex) => (
+                <article key={`ability-${abilityIndex}`} className="designer-ability">
+                  <div className="designer-section__header">
+                    <label className="designer-field">
+                      <span>Trigger</span>
+                      <select
+                        value={ability.trigger}
+                        onChange={(event) =>
+                          updateAbility(abilityIndex, (current) => ({
+                            ...current,
+                            trigger: event.target.value as typeof current.trigger
+                          }))
+                        }
+                      >
+                        {TRIGGER_OPTIONS.map((trigger) => (
+                          <option key={trigger} value={trigger}>
+                            {trigger}
+                          </option>
+                        ))}
+                      </select>
+                    </label>
+                    <button
+                      type="button"
+                      className="secondary-button"
+                      onClick={() =>
+                        updateDraft((current) => ({
+                          ...current,
+                          abilities: current.abilities.filter((_, index) => index !== abilityIndex)
+                        }))
+                      }
+                      disabled={draft.abilities.length === 1}
+                    >
+                      Remove Ability
+                    </button>
+                  </div>
+
+                  {ability.effects.map((effect, effectIndex) => (
+                    <div key={`effect-${abilityIndex}-${effectIndex}`} className="designer-effect">
+                      <div className="designer-grid designer-grid--tight">
+                        <label className="designer-field">
+                          <span>Effect</span>
+                          <select
+                            value={effect.kind}
+                            onChange={(event) =>
+                              updateEffect(abilityIndex, effectIndex, () => createDefaultEffect(event.target.value as Effect["kind"]))
+                            }
+                          >
+                            {EFFECT_OPTIONS.map((effectKind) => (
+                              <option key={effectKind} value={effectKind}>
+                                {effectKind}
+                              </option>
+                            ))}
+                          </select>
+                        </label>
+
+                        {"amount" in effect ? (
+                          <label className="designer-field">
+                            <span>Amount</span>
+                            <input
+                              type="number"
+                              value={effect.amount}
+                              onChange={(event) =>
+                                updateEffect(abilityIndex, effectIndex, (current) => ({
+                                  ...current,
+                                  amount: Number(event.target.value)
+                                }))
+                              }
+                            />
+                          </label>
+                        ) : null}
+
+                        {effect.kind === "grantStatus" ? (
+                          <label className="designer-field">
+                            <span>Status</span>
+                            <select
+                              value={effect.status}
+                              onChange={(event) =>
+                                updateEffect(abilityIndex, effectIndex, (current) => ({
+                                  ...current,
+                                  status: event.target.value as typeof effect.status
+                                }))
+                              }
+                            >
+                              {STATUS_OPTIONS.map((status) => (
+                                <option key={status} value={status}>
+                                  {status}
+                                </option>
+                              ))}
+                            </select>
+                          </label>
+                        ) : null}
+
+                        {effect.kind === "summonToken" ? (
+                          <>
+                            <label className="designer-field">
+                              <span>Token</span>
+                              <select
+                                value={effect.tokenCardId}
+                                onChange={(event) =>
+                                  updateEffect(abilityIndex, effectIndex, (current) => ({
+                                    ...current,
+                                    tokenCardId: event.target.value
+                                  }))
+                                }
+                              >
+                                {getTokenOptions().map((token) => (
+                                  <option key={token.id} value={token.id}>
+                                    {token.label}
+                                  </option>
+                                ))}
+                              </select>
+                            </label>
+                            <label className="designer-field">
+                              <span>Summon Position</span>
+                              <select
+                                value={effect.position}
+                                onChange={(event) =>
+                                  updateEffect(abilityIndex, effectIndex, (current) => ({
+                                    ...current,
+                                    position: event.target.value as typeof effect.position
+                                  }))
+                                }
+                              >
+                                <option value="firstEmpty">First empty lane</option>
+                                <option value="sameLane">Same lane</option>
+                              </select>
+                            </label>
+                          </>
+                        ) : null}
+
+                        {hasTarget(effect) ? (
+                          <label className="designer-field">
+                            <span>Selector</span>
+                            <select
+                              value={effect.target.selector}
+                              onChange={(event) =>
+                                updateEffect(abilityIndex, effectIndex, (current) =>
+                                  hasTarget(current)
+                                    ? {
+                                        ...current,
+                                        target: {
+                                          ...current.target,
+                                          selector: event.target.value as typeof current.target.selector
+                                        }
+                                      }
+                                    : current
+                                )
+                              }
+                            >
+                              {SELECTOR_OPTIONS.map((selector) => (
+                                <option key={selector} value={selector}>
+                                  {selector}
+                                </option>
+                              ))}
+                            </select>
+                          </label>
+                        ) : null}
+                      </div>
+
+                      {hasTarget(effect) ? (
+                        <div className="designer-filters">
+                          {FILTER_OPTIONS.map((filter) => (
+                            <label key={filter} className="designer-checkbox">
+                              <input
+                                type="checkbox"
+                                checked={effect.target.filters?.includes(filter) ?? false}
+                                onChange={(event) =>
+                                  updateEffect(abilityIndex, effectIndex, (current) =>
+                                    hasTarget(current)
+                                      ? {
+                                          ...current,
+                                          target: {
+                                            ...current.target,
+                                            filters: updateTargetFilters(current.target.filters, filter, event.target.checked)
+                                          }
+                                        }
+                                      : current
+                                  )
+                                }
+                              />
+                              <span>{filter}</span>
+                            </label>
+                          ))}
+                        </div>
+                      ) : null}
+
+                      <div className="designer-effect__actions">
+                        <button
+                          type="button"
+                          className="secondary-button"
+                          onClick={() =>
+                            updateAbility(abilityIndex, (current) => ({
+                              ...current,
+                              effects: current.effects.filter((_, index) => index !== effectIndex)
+                            }))
+                          }
+                          disabled={ability.effects.length === 1}
+                        >
+                          Remove Effect
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+
+                  <button
+                    type="button"
+                    className="secondary-button"
+                    onClick={() =>
+                      updateAbility(abilityIndex, (current) => ({
+                        ...current,
+                        effects: [...current.effects, createDefaultEffect()]
+                      }))
+                    }
+                  >
+                    Add Effect
+                  </button>
+                </article>
+              ))}
+            </div>
           </div>
-        ) : (
-          <div className="empty-panel">Add an ability first and the term editor will appear here.</div>
-        )}
-      </div>
 
-      <div className="designer-preview-grid">
-        <div className={`inspector-card faction-${preview.card.faction}`}>
-          <div className="inspector-card__title">
-            <div>
-              <strong>{preview.card.name}</strong>
-              <div className="inspector-card__meta">
-                {preview.card.kind === "unit" ? `${preview.card.attack}/${preview.card.health} unit` : "spell"} · cost{" "}
-                {preview.card.cost}
+          <div className="designer-section">
+            <div className="designer-section__header">
+              <h3>Term Overrides</h3>
+              <span>Rename only the semantic pieces this draft actually uses.</span>
+            </div>
+            {usedTerms.length > 0 ? (
+              <div className="designer-grid">
+                {usedTerms.map((entry) => (
+                  <label key={`${entry.category}-${entry.key}`} className="designer-field">
+                    <span>
+                      {entry.category}: {entry.label}
+                    </span>
+                    <input
+                      placeholder={entry.label}
+                      value={getTermValue(termOverrides, entry)}
+                      onChange={(event) => setTermOverrides((current) => setTermValue(current, entry, event.target.value))}
+                    />
+                  </label>
+                ))}
               </div>
-            </div>
-            <span>{preview.card.faction}</span>
+            ) : (
+              <div className="empty-panel">Add an ability first and the term editor will appear here.</div>
+            )}
           </div>
-          <div className="designer-preview__block">
-            <strong>Canonical Syntax</strong>
-            <div className="designer-preview__list">
-              {preview.canonicalRules.map((rule) => (
-                <div key={rule}>{rule}</div>
-              ))}
-            </div>
-          </div>
-          <div className="designer-preview__block">
-            <strong>Friendly Card Text</strong>
-            <div className="designer-preview__list">
-              {preview.rules.map((rule) => (
-                <div key={rule}>{rule}</div>
-              ))}
-            </div>
-          </div>
-        </div>
 
-        <div className="designer-preview__block">
-          <strong>Payload JSON</strong>
-          <pre className="semantic-json">{JSON.stringify(preview.card, null, 2)}</pre>
-        </div>
-
-        <div className="designer-preview__block">
-          <strong>Term Overrides JSON</strong>
-          <pre className="semantic-json">{JSON.stringify(normalizeTerms(termOverrides), null, 2)}</pre>
-        </div>
-      </div>
-
-      <div className="designer-section">
-        <div className="designer-section__header">
-          <h3>Saved Designs</h3>
-          <span>Stored locally in your browser.</span>
-        </div>
-        {savedDesigns.length > 0 ? (
-          <div className="saved-designs">
-            {savedDesigns.map((design) => (
-              <div key={design.id} className="saved-design">
+          <div className="designer-preview-grid">
+            <div className={`inspector-card faction-${preview.card.faction}`}>
+              <div className="inspector-card__title">
                 <div>
-                  <strong>{design.card.name}</strong>
-                  <div className="card-view__meta">{design.card.id}</div>
+                  <strong>{preview.card.name}</strong>
+                  <div className="inspector-card__meta">
+                    {preview.card.kind === "unit" ? `${preview.card.attack}/${preview.card.health} unit` : "spell"} · cost{" "}
+                    {preview.card.cost}
+                  </div>
                 </div>
-                <div className="saved-design__actions">
-                  <button
-                    type="button"
-                    className="secondary-button"
-                    onClick={() => {
-                      setDraft(cardToDraft(design.card));
-                      setTermOverrides(design.termOverrides ?? {});
-                    }}
-                  >
-                    Load
-                  </button>
-                  <button
-                    type="button"
-                    className="secondary-button"
-                    onClick={() => setSavedDesigns((current) => current.filter((entry) => entry.id !== design.id))}
-                  >
-                    Delete
-                  </button>
+                <span>{preview.card.faction}</span>
+              </div>
+              <div className="designer-preview__block">
+                <strong>Canonical Syntax</strong>
+                <div className="designer-preview__list">
+                  {preview.canonicalRules.map((rule) => (
+                    <div key={rule}>{rule}</div>
+                  ))}
                 </div>
               </div>
-            ))}
+              <div className="designer-preview__block">
+                <strong>Friendly Card Text</strong>
+                <div className="designer-preview__list">
+                  {preview.rules.map((rule) => (
+                    <div key={rule}>{rule}</div>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            <div className="designer-preview__block">
+              <strong>Payload JSON</strong>
+              <pre className="semantic-json">{JSON.stringify(preview.card, null, 2)}</pre>
+            </div>
+
+            <div className="designer-preview__block">
+              <strong>Term Overrides JSON</strong>
+              <pre className="semantic-json">{JSON.stringify(normalizeTerms(termOverrides), null, 2)}</pre>
+            </div>
           </div>
-        ) : (
-          <div className="empty-panel">Save a draft to keep it around between sessions.</div>
-        )}
-      </div>
+
+          <div className="designer-section">
+            <div className="designer-section__header">
+              <h3>Saved Designs</h3>
+              <span>Stored locally in your browser.</span>
+            </div>
+            {savedDesigns.length > 0 ? (
+              <div className="saved-designs">
+                {savedDesigns.map((design) => (
+                  <div key={design.id} className="saved-design">
+                    <div>
+                      <strong>{design.card.name}</strong>
+                      <div className="card-view__meta">{design.card.id}</div>
+                    </div>
+                    <div className="saved-design__actions">
+                      <button
+                        type="button"
+                        className="secondary-button"
+                        onClick={() => {
+                          setDraft(cardToDraft(design.card));
+                          setTermOverrides(design.termOverrides ?? {});
+                        }}
+                      >
+                        Load
+                      </button>
+                      <button
+                        type="button"
+                        className="secondary-button"
+                        onClick={() => setSavedDesigns((current) => current.filter((entry) => entry.id !== design.id))}
+                      >
+                        Delete
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="empty-panel">Save a draft to keep it around between sessions.</div>
+            )}
+          </div>
+        </>
+      )}
     </section>
   );
 }

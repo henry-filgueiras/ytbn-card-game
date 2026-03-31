@@ -1,0 +1,268 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1800" height="1240" viewBox="0 0 1800 1240">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#171314"/>
+      <stop offset="100%" stop-color="#241a1f"/>
+    </linearGradient>
+    <linearGradient id="ember" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#4e2d22"/>
+      <stop offset="100%" stop-color="#2c1a18"/>
+    </linearGradient>
+    <linearGradient id="verdant" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#1f3c30"/>
+      <stop offset="100%" stop-color="#17261f"/>
+    </linearGradient>
+    <style>
+      .title { font: 700 34px "Avenir Next", "Segoe UI", sans-serif; fill: #f6efe0; }
+      .subtitle { font: 500 16px "Avenir Next", "Segoe UI", sans-serif; fill: #d8cdbb; }
+      .panelTitle { font: 700 22px "Avenir Next", "Segoe UI", sans-serif; fill: #fff1da; }
+      .panelText { font: 500 15px "Avenir Next", "Segoe UI", sans-serif; fill: #ddd1c0; }
+      .small { font: 500 13px "Avenir Next", "Segoe UI", sans-serif; fill: #bcaf9b; }
+      .tiny { font: 500 12px "Avenir Next", "Segoe UI", sans-serif; fill: #9f9588; }
+      .pill { font: 700 12px "Avenir Next", "Segoe UI", sans-serif; fill: #ffe3b0; }
+      .mono { font: 500 13px Menlo, Monaco, monospace; fill: #d9f0da; }
+      .cardName { font: 700 16px "Avenir Next", "Segoe UI", sans-serif; fill: #f7eedc; }
+      .cardRule { font: 500 13px "Avenir Next", "Segoe UI", sans-serif; fill: #f0e5d4; }
+      .forecastHead { font: 700 14px "Avenir Next", "Segoe UI", sans-serif; fill: #f9efdc; }
+      .forecastBody { font: 500 13px "Avenir Next", "Segoe UI", sans-serif; fill: #d6cab9; }
+    </style>
+  </defs>
+
+  <rect width="1800" height="1240" fill="url(#bg)"/>
+  <circle cx="1500" cy="90" r="230" fill="#ff8f4e" opacity="0.12"/>
+  <circle cx="280" cy="90" r="180" fill="#7dd49e" opacity="0.08"/>
+
+  <text x="60" y="62" class="title">Semantic Lane Duel Storyboard</text>
+  <text x="60" y="92" class="subtitle">Gameplay snapshots plus the on-demand card designer flow.</text>
+
+  <!-- Panel 1 -->
+  <g transform="translate(60 130)">
+    <rect width="520" height="430" rx="24" fill="#100e11" opacity="0.82" stroke="#ffffff" stroke-opacity="0.08"/>
+    <text x="24" y="38" class="panelTitle">1. Main Phase: pick a lane and deploy</text>
+    <text x="24" y="64" class="small">Cinder Scout is selected, and the center lane is being offered as a legal deploy target.</text>
+
+    <rect x="24" y="86" width="472" height="48" rx="16" fill="#ffffff" fill-opacity="0.05"/>
+    <text x="40" y="116" class="panelText">Turn 3 · Your turn</text>
+    <text x="210" y="116" class="small">Choose an empty lane for Cinder Scout.</text>
+
+    <rect x="24" y="150" width="472" height="62" rx="18" fill="#ffffff" fill-opacity="0.05" stroke="#ffffff" stroke-opacity="0.08"/>
+    <text x="42" y="178" class="panelText">AI Hero 20/20</text>
+    <text x="42" y="200" class="tiny">Deck 15 · Hand 5 · Discard 0</text>
+
+    <g transform="translate(24 228)">
+      <g transform="translate(0 0)">
+        <rect width="146" height="118" rx="18" fill="#ffffff" fill-opacity="0.03" stroke="#ffffff" stroke-opacity="0.06"/>
+        <text x="50" y="62" class="tiny">Open enemy lane</text>
+      </g>
+      <g transform="translate(163 0)">
+        <rect width="146" height="118" rx="18" fill="#ffffff" fill-opacity="0.03" stroke="#ffb55e" stroke-width="2"/>
+        <text x="18" y="60" class="small">Click to deploy here</text>
+      </g>
+      <g transform="translate(326 0)">
+        <rect width="146" height="118" rx="18" fill="#ffffff" fill-opacity="0.03" stroke="#ffffff" stroke-opacity="0.06"/>
+        <text x="32" y="62" class="tiny">Open allied lane</text>
+      </g>
+      <text x="44" y="138" class="tiny">Left lane</text>
+      <text x="207" y="138" class="tiny">Center lane</text>
+      <text x="374" y="138" class="tiny">Right lane</text>
+    </g>
+
+    <rect x="24" y="382" width="472" height="22" rx="11" fill="#ffffff" fill-opacity="0.02"/>
+    <text x="24" y="372" class="panelText">Your hand</text>
+
+    <g transform="translate(24 414)">
+      <g>
+        <rect width="146" height="126" rx="18" fill="url(#ember)" stroke="#ffffff" stroke-opacity="0.08"/>
+        <circle cx="22" cy="22" r="14" fill="#ffffff" fill-opacity="0.14"/>
+        <text x="17" y="27" class="small">1</text>
+        <text x="44" y="28" class="cardName">Ember Initiate</text>
+        <text x="44" y="46" class="tiny">2/1 unit · ember</text>
+        <text x="16" y="76" class="cardRule">On play: Deal 1 damage</text>
+        <text x="16" y="94" class="cardRule">to chosen enemy.</text>
+      </g>
+      <g transform="translate(163 0)">
+        <rect width="146" height="126" rx="18" fill="url(#ember)" stroke="#ffb55e" stroke-width="3"/>
+        <circle cx="22" cy="22" r="14" fill="#ffffff" fill-opacity="0.14"/>
+        <text x="17" y="27" class="small">2</text>
+        <text x="44" y="28" class="cardName">Cinder Scout</text>
+        <text x="44" y="46" class="tiny">2/2 unit · ember</text>
+        <text x="16" y="76" class="cardRule">On attack: Give Burning 1</text>
+        <text x="16" y="94" class="cardRule">to the opposing unit in lane.</text>
+        <text x="16" y="114" class="pill">SELECTED</text>
+      </g>
+      <g transform="translate(326 0)">
+        <rect width="146" height="126" rx="18" fill="url(#ember)" stroke="#ffffff" stroke-opacity="0.08"/>
+        <circle cx="22" cy="22" r="14" fill="#ffffff" fill-opacity="0.14"/>
+        <text x="17" y="27" class="small">3</text>
+        <text x="44" y="28" class="cardName">Scorchline</text>
+        <text x="44" y="46" class="tiny">spell · ember</text>
+        <text x="16" y="76" class="cardRule">On play: Deal 1 damage</text>
+        <text x="16" y="94" class="cardRule">to all enemy units.</text>
+      </g>
+    </g>
+  </g>
+
+  <!-- Panel 2 -->
+  <g transform="translate(620 130)">
+    <rect width="560" height="430" rx="24" fill="#100e11" opacity="0.82" stroke="#ffffff" stroke-opacity="0.08"/>
+    <text x="24" y="38" class="panelTitle">2. Readiness and combat are forecast before the pass</text>
+    <text x="24" y="64" class="small">The newly played scout shows summoning sickness, and the forecast explains what end turn will resolve.</text>
+
+    <rect x="24" y="86" width="512" height="48" rx="16" fill="#ffffff" fill-opacity="0.05"/>
+    <text x="40" y="116" class="panelText">Main phase: play cards now, then end the turn to resolve combat.</text>
+
+    <g transform="translate(24 150)">
+      <rect width="240" height="222" rx="18" fill="#ffffff" fill-opacity="0.04" stroke="#ffffff" stroke-opacity="0.06"/>
+      <text x="18" y="28" class="panelText">Board state</text>
+
+      <g transform="translate(18 48)">
+        <rect width="204" height="64" rx="16" fill="url(#verdant)" stroke="#ffffff" stroke-opacity="0.08"/>
+        <text x="14" y="24" class="cardName">Field Medic</text>
+        <text x="14" y="44" class="tiny">Enemy unit in center lane · 1/3</text>
+      </g>
+
+      <g transform="translate(18 122)">
+        <rect width="204" height="80" rx="16" fill="url(#ember)" stroke="#ffffff" stroke-opacity="0.08"/>
+        <text x="14" y="24" class="cardName">Furnace Hound</text>
+        <text x="14" y="44" class="tiny">Left lane · 3/2 · ready</text>
+        <rect x="14" y="52" width="68" height="18" rx="9" fill="#ffffff" fill-opacity="0.08"/>
+        <text x="24" y="65" class="pill">READY</text>
+      </g>
+
+      <g transform="translate(18 212)">
+        <rect width="204" height="88" rx="16" fill="url(#ember)" stroke="#ffb55e" stroke-width="2"/>
+        <text x="14" y="24" class="cardName">Cinder Scout</text>
+        <text x="14" y="44" class="tiny">Center lane · 2/2</text>
+        <rect x="14" y="54" width="142" height="20" rx="10" fill="#ffb55e" fill-opacity="0.16"/>
+        <text x="24" y="68" class="pill">SUMMONING SICKNESS</text>
+      </g>
+    </g>
+
+    <g transform="translate(284 150)">
+      <rect width="252" height="222" rx="18" fill="#ffffff" fill-opacity="0.04" stroke="#ffffff" stroke-opacity="0.06"/>
+      <text x="18" y="28" class="panelText">Combat Forecast</text>
+
+      <g transform="translate(18 48)">
+        <rect width="216" height="56" rx="14" fill="#ffffff" fill-opacity="0.04" stroke="#ffb55e" stroke-opacity="0.22"/>
+        <text x="14" y="22" class="forecastHead">Left lane · Face hit</text>
+        <text x="14" y="42" class="forecastBody">Furnace Hound will hit the enemy hero for 3.</text>
+      </g>
+
+      <g transform="translate(18 114)">
+        <rect width="216" height="72" rx="14" fill="#ffffff" fill-opacity="0.04" stroke="#8fc0ff" stroke-opacity="0.24"/>
+        <text x="14" y="22" class="forecastHead">Center lane · New</text>
+        <text x="14" y="42" class="forecastBody">Cinder Scout has summoning sickness and</text>
+        <text x="14" y="60" class="forecastBody">will not attack this turn.</text>
+      </g>
+
+      <g transform="translate(18 196)">
+        <rect width="216" height="56" rx="14" fill="#ffffff" fill-opacity="0.04" stroke="#ffffff" stroke-opacity="0.08"/>
+        <text x="14" y="22" class="forecastHead">Right lane · Idle</text>
+        <text x="14" y="42" class="forecastBody">No unit will attack from this lane.</text>
+      </g>
+    </g>
+
+    <rect x="24" y="390" width="220" height="20" rx="10" fill="#ffffff" fill-opacity="0.06"/>
+    <text x="40" y="404" class="pill">END TURN &amp; RESOLVE COMBAT</text>
+  </g>
+
+  <!-- Panel 3 -->
+  <g transform="translate(1200 130)">
+    <rect width="540" height="430" rx="24" fill="#100e11" opacity="0.82" stroke="#ffffff" stroke-opacity="0.08"/>
+    <text x="24" y="38" class="panelTitle">3. End turn resolves abilities, then lane combat</text>
+    <text x="24" y="64" class="small">The log makes the attack/defend phase legible even before animation polish exists.</text>
+
+    <rect x="24" y="92" width="492" height="284" rx="18" fill="#ffffff" fill-opacity="0.04" stroke="#ffffff" stroke-opacity="0.06"/>
+    <text x="42" y="122" class="panelText">Event Log</text>
+
+    <g transform="translate(42 144)">
+      <rect width="456" height="38" rx="12" fill="#ffffff" fill-opacity="0.04"/>
+      <text x="14" y="24" class="panelText">Furnace Hound: At the end of your turn: Deal 1 damage to the enemy hero.</text>
+    </g>
+    <g transform="translate(42 192)">
+      <rect width="456" height="38" rx="12" fill="#ffffff" fill-opacity="0.04"/>
+      <text x="14" y="24" class="panelText">Furnace Hound deals 1 damage to the enemy hero.</text>
+    </g>
+    <g transform="translate(42 240)">
+      <rect width="456" height="38" rx="12" fill="#ffffff" fill-opacity="0.04"/>
+      <text x="14" y="24" class="panelText">Furnace Hound deals 3 damage to the enemy hero.</text>
+    </g>
+    <g transform="translate(42 288)">
+      <rect width="456" height="38" rx="12" fill="#ffffff" fill-opacity="0.04"/>
+      <text x="14" y="24" class="panelText">Cinder Scout cannot attack on the turn it entered play.</text>
+    </g>
+    <g transform="translate(42 336)">
+      <rect width="456" height="38" rx="12" fill="#ffffff" fill-opacity="0.04"/>
+      <text x="14" y="24" class="panelText">AI begins turn 4.</text>
+    </g>
+
+    <rect x="24" y="392" width="492" height="20" rx="10" fill="#ffffff" fill-opacity="0.02"/>
+    <text x="24" y="412" class="tiny">The flow is still deterministic: end-turn triggers, persistent damage ticks, then lane attacks.</text>
+  </g>
+
+  <!-- Panel 4 -->
+  <g transform="translate(60 590)">
+    <rect width="1680" height="580" rx="24" fill="#100e11" opacity="0.82" stroke="#ffffff" stroke-opacity="0.08"/>
+    <text x="24" y="40" class="panelTitle">4. The designer stays collapsed until the player asks for it</text>
+    <text x="24" y="66" class="small">Collapsed state keeps the play surface focused; opening it reveals canonical syntax, payload JSON, and term overrides.</text>
+
+    <g transform="translate(24 96)">
+      <rect width="464" height="156" rx="18" fill="#ffffff" fill-opacity="0.04" stroke="#ffffff" stroke-opacity="0.06"/>
+      <text x="20" y="30" class="panelText">Collapsed designer</text>
+      <text x="312" y="30" class="small">Open Designer</text>
+      <text x="20" y="62" class="cardName">Custom Signal</text>
+      <text x="20" y="84" class="tiny">2/3 unit · cost 3 · custom-signal</text>
+      <text x="20" y="118" class="mono">on play -&gt; deal 1 damage to chosen enemy</text>
+      <text x="20" y="142" class="tiny">4 semantic terms in use · 2 saved designs</text>
+    </g>
+
+    <g transform="translate(518 96)">
+      <rect width="1138" height="452" rx="18" fill="#ffffff" fill-opacity="0.04" stroke="#ffffff" stroke-opacity="0.06"/>
+      <text x="22" y="30" class="panelText">Expanded designer</text>
+      <text x="938" y="30" class="small">Collapse Designer</text>
+
+      <g transform="translate(22 54)">
+        <rect width="360" height="120" rx="16" fill="#ffffff" fill-opacity="0.04"/>
+        <text x="14" y="24" class="forecastHead">Draft controls</text>
+        <text x="14" y="52" class="panelText">Name: Custom Signal</text>
+        <text x="14" y="74" class="panelText">Kind: Unit · Faction: Neutral · Cost: 3</text>
+        <text x="14" y="96" class="panelText">Attack: 2 · Health: 3</text>
+      </g>
+
+      <g transform="translate(398 54)">
+        <rect width="350" height="160" rx="16" fill="#ffffff" fill-opacity="0.04"/>
+        <text x="14" y="24" class="forecastHead">Canonical Syntax</text>
+        <text x="14" y="58" class="mono">on play -&gt; deal 1 damage to chosen enemy</text>
+        <text x="14" y="92" class="forecastHead">Friendly Card Text</text>
+        <text x="14" y="118" class="panelText">On play: Deal 1 damage to chosen enemy.</text>
+      </g>
+
+      <g transform="translate(764 54)">
+        <rect width="352" height="356" rx="16" fill="#060608" fill-opacity="0.7"/>
+        <text x="16" y="26" class="forecastHead">Payload JSON</text>
+        <text x="16" y="54" class="mono">{</text>
+        <text x="36" y="78" class="mono">"id": "custom-signal",</text>
+        <text x="36" y="102" class="mono">"name": "Custom Signal",</text>
+        <text x="36" y="126" class="mono">"kind": "unit",</text>
+        <text x="36" y="150" class="mono">"cost": 3,</text>
+        <text x="36" y="174" class="mono">"attack": 2,</text>
+        <text x="36" y="198" class="mono">"health": 3,</text>
+        <text x="36" y="222" class="mono">"abilities": [</text>
+        <text x="56" y="246" class="mono">{ "trigger": "onPlay", ... }</text>
+        <text x="36" y="270" class="mono">]</text>
+        <text x="16" y="298" class="mono">}</text>
+      </g>
+
+      <g transform="translate(22 190)">
+        <rect width="726" height="220" rx="16" fill="#ffffff" fill-opacity="0.04"/>
+        <text x="14" y="24" class="forecastHead">Ability + term editor</text>
+        <text x="14" y="54" class="panelText">Trigger: onPlay · Effect: dealDamage · Amount: 1 · Selector: chosenEnemy</text>
+        <text x="14" y="86" class="panelText">Term Overrides:</text>
+        <text x="30" y="114" class="panelText">trigger: onPlay -&gt; "signal"</text>
+        <text x="30" y="138" class="panelText">verb: dealDamage -&gt; "mark"</text>
+        <text x="30" y="162" class="panelText">selector: chosenEnemy -&gt; "called rival"</text>
+        <text x="14" y="198" class="tiny">The engine semantics stay strict; the wording layer can become more natural-language-adjacent.</text>
+      </g>
+    </g>
+  </g>
+</svg>

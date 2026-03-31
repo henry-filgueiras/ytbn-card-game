@@ -22,6 +22,7 @@ Or use the Makefile:
 ```bash
 make install
 make dev
+make storyboard
 ```
 
 ## Verify It
@@ -57,6 +58,13 @@ make build
 - The board now shows a `Combat Forecast` panel so you can see what each lane will do when the current player ends the turn.
 - Newly played units visibly show `Summoning sickness` during the turn where they cannot attack.
 - The end-turn control is labeled to make it clearer that combat resolves immediately afterward.
+- The card designer starts collapsed so the match UI stays focused until you explicitly open the tool.
+
+## Storyboard
+
+- Source SVG: [`storyboard/semantic-lane-duel-storyboard.svg`](/Users/henry/ytbn-card-game/storyboard/semantic-lane-duel-storyboard.svg)
+- Rendered PNG: [`storyboard/semantic-lane-duel-storyboard.png`](/Users/henry/ytbn-card-game/storyboard/semantic-lane-duel-storyboard.png)
+- Regenerate it with `make storyboard`
 
 ## Semantic Schema
 
