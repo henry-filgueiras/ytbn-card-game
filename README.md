@@ -47,6 +47,7 @@ The app now opens on a landing screen with multiple topologies:
 - `Raid Boss Engagement`: a `1v3` commander-style board shell
 - `Triad Skirmish`: a `1v1v1` political triangle
 - `Twinfront Clash`: a `2v2` partner board with a shared center
+- `Topology Proof`: a semantic lab screen that shows one canonical card mutating across all four board geometries
 
 Right now the duel is fully wired into the live engine. The larger multiplayer layouts load as topology sandboxes with board geometry, semantic remaps, and ritual design notes so we can evolve the engine toward them intentionally.
 
@@ -136,7 +137,11 @@ On play: Deal 1 damage to chosen enemy. Then Draw 1 card.
 - [`src/data/decks.ts`](/Users/henry/ytbn-card-game/src/data/decks.ts): fixed starter decks
 - [`src/App.tsx`](/Users/henry/ytbn-card-game/src/App.tsx): landing flow, playable duel UI, and topology preview routing
 - [`src/game/modes.ts`](/Users/henry/ytbn-card-game/src/game/modes.ts): mode definitions, topology metadata, semantic remaps, and ritual concepts
+- [`src/game/proofCards.ts`](/Users/henry/ytbn-card-game/src/game/proofCards.ts): canonical test-card set for the topology proof surface
+- [`src/game/topology.ts`](/Users/henry/ytbn-card-game/src/game/topology.ts): topology adapters, proof diagrams, transformed rendering, and preview-target computation
 - [`src/ui/LandingScreen.tsx`](/Users/henry/ytbn-card-game/src/ui/LandingScreen.tsx): mode-selection landing page
+- [`src/ui/TopologyProofScreen.tsx`](/Users/henry/ytbn-card-game/src/ui/TopologyProofScreen.tsx): dedicated proof surface for topology-sensitive semantics
+- [`src/ui/TopologyDiagram.tsx`](/Users/henry/ytbn-card-game/src/ui/TopologyDiagram.tsx): intentional proof diagrams with legal-target highlighting
 - [`src/ui/ModeTopologyBoard.tsx`](/Users/henry/ytbn-card-game/src/ui/ModeTopologyBoard.tsx): topology-aware board shells for non-duel modes
 - [`src/ui/ModeConceptPanel.tsx`](/Users/henry/ytbn-card-game/src/ui/ModeConceptPanel.tsx): semantic shift and ritual concept panels
 - [`src/ui/CardDesigner.tsx`](/Users/henry/ytbn-card-game/src/ui/CardDesigner.tsx): in-browser card designer with payload export and custom terminology

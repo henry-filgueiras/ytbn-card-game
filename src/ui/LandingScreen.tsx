@@ -2,9 +2,10 @@ import { GAME_MODES, type GameModeId } from "../game/modes";
 
 interface LandingScreenProps {
   onSelectMode: (modeId: GameModeId) => void;
+  onOpenProof: () => void;
 }
 
-export function LandingScreen({ onSelectMode }: LandingScreenProps) {
+export function LandingScreen({ onSelectMode, onOpenProof }: LandingScreenProps) {
   return (
     <main className="landing-layout">
       <section className="landing-hero">
@@ -80,6 +81,17 @@ export function LandingScreen({ onSelectMode }: LandingScreenProps) {
             </button>
           </article>
         ))}
+      </section>
+
+      <section className="proof-cta surface-panel" data-surface="proof-cta">
+        <div>
+          <span className="landing-kicker">Semantic lab surface</span>
+          <h3>Topology Proof</h3>
+          <p>See the same card mutate across board geometries, with legal targets and human-readable text updating in sync.</p>
+        </div>
+        <button type="button" className="primary-button" onClick={onOpenProof}>
+          Open Topology Proof
+        </button>
       </section>
     </main>
   );

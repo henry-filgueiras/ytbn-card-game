@@ -4,7 +4,7 @@ interface AppHeaderProps {
   title: string;
   description: string;
   badge?: string;
-  scene: "landing" | "duel" | "sandbox";
+  scene: "landing" | "duel" | "sandbox" | "proof";
   actions?: ReactNode;
 }
 

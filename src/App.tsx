@@ -20,6 +20,9 @@ import { DuelBoard } from "./ui/DuelBoard";
 import { DuelSidebar } from "./ui/DuelSidebar";
 import { LandingScreen } from "./ui/LandingScreen";
 import { ModeSandboxView } from "./ui/ModeSandboxView";
+import { TopologyProofScreen } from "./ui/TopologyProofScreen";
+
+type AppSurface = GameModeId | "proof" | null;
 
 interface InspectSelection {
   cardId?: string;
@@ -43,14 +46,15 @@ function winnerLabel(winner: ReturnType<typeof createGame>["winner"]): string {
 }
 
 export default function App() {
-  const [activeModeId, setActiveModeId] = useState<GameModeId | null>(null);
+  const [activeSurface, setActiveSurface] = useState<AppSurface>(null);
   const [game, setGame] = useState(() => createGame());
   const [selectedHandIndex, setSelectedHandIndex] = useState<number | null>(null);
   const [selectedLane, setSelectedLane] = useState<number | null>(null);
   const [inspection, setInspection] = useState<InspectSelection>({});
 
-  const activeMode = activeModeId ? getGameModeById(activeModeId) : null;
-  const scene = !activeMode ? "landing" : activeMode.id === "duel" ? "duel" : "sandbox";
+  const activeMode = activeSurface && activeSurface !== "proof" ? getGameModeById(activeSurface) : null;
+  const isProofSurface = activeSurface === "proof";
+  const scene = !activeSurface ? "landing" : isProofSurface ? "proof" : activeMode?.id === "duel" ? "duel" : "sandbox";
   const isDuelMode = scene === "duel";
   const playableModeCount = GAME_MODES.filter((mode) => mode.support === "playable").length;
 
@@ -132,7 +136,7 @@ export default function App() {
   }
 
   function openMode(modeId: GameModeId) {
-    setActiveModeId(modeId);
+    setActiveSurface(modeId);
     clearSelectionState();
 
     if (modeId === "duel") {
@@ -140,8 +144,13 @@ export default function App() {
     }
   }
 
+  function openProof() {
+    setActiveSurface("proof");
+    clearSelectionState();
+  }
+
   function returnToModeSelect() {
-    setActiveModeId(null);
+    setActiveSurface(null);
     clearSelectionState();
   }
 
@@ -263,6 +272,30 @@ export default function App() {
   }
 
   if (!activeMode) {
+    if (isProofSurface) {
+      return (
+        <div className="app-shell" data-scene={scene}>
+          <AppHeader
+            title="Topology Proof"
+            description="One canonical card payload, four board geometries, four different human readings and legal target maps."
+            badge="Semantic laboratory"
+            scene="proof"
+            actions={
+              <>
+                <button type="button" className="secondary-button" onClick={returnToModeSelect}>
+                  Back To Landing
+                </button>
+                <button type="button" className="primary-button" onClick={() => openMode("duel")}>
+                  Jump Into Duel
+                </button>
+              </>
+            }
+          />
+          <TopologyProofScreen />
+        </div>
+      );
+    }
+
     return (
       <div className="app-shell" data-scene={scene}>
         <AppHeader
@@ -271,7 +304,7 @@ export default function App() {
           badge={`${playableModeCount} live mode · ${GAME_MODES.length - playableModeCount} topology sandboxes`}
           scene="landing"
         />
-        <LandingScreen onSelectMode={openMode} />
+        <LandingScreen onSelectMode={openMode} onOpenProof={openProof} />
       </div>
     );
   }
