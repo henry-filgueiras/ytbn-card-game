@@ -1,0 +1,114 @@
+# Semantic Lane Duel
+
+Semantic Lane Duel is a local-only browser prototype for a card game where card language maps directly to structured semantic actions in the engine.
+
+The important constraint in this project is that rules text is not the source of truth. Cards are authored as structured ability objects, and the same data is used to:
+
+- resolve gameplay effects
+- render English card text in the UI
+- drive the inspector panel that shows the semantic schema
+
+## Run It
+
+```bash
+npm install
+npm run dev
+```
+
+Then open the local Vite URL in a browser.
+
+Or use the Makefile:
+
+```bash
+make install
+make dev
+```
+
+## Verify It
+
+```bash
+npm test
+npm run build
+```
+
+Make equivalents:
+
+```bash
+make test
+make build
+```
+
+## Prototype Rules
+
+- `1v1` match with `3` lanes
+- Each hero starts at `20` health
+- Both players begin with an opening hand of `4`, then draw `1` at the start of each turn
+- Max energy increases by `1` each turn up to `8`, then refills
+- Units are played into empty friendly lanes
+- Spells resolve immediately and go to discard
+- At the end of a player's turn, their units attack automatically:
+  - if the opposing lane has a unit, combat is simultaneous
+  - otherwise the attacker hits the enemy hero
+- Units cannot attack on the turn they enter play
+- If a hero reaches `0`, the game ends
+
+## Clarity Helpers
+
+- The board now shows a `Combat Forecast` panel so you can see what each lane will do when the current player ends the turn.
+- Newly played units visibly show `Summoning sickness` during the turn where they cannot attack.
+- The end-turn control is labeled to make it clearer that combat resolves immediately afterward.
+
+## Semantic Schema
+
+Abilities are composed from small semantic pieces:
+
+- `trigger`: `onPlay`, `onDeath`, `startOfTurn`, `endOfTurn`, `onAttack`
+- `selector`: `self`, `chosenAlly`, `chosenEnemy`, `randomEnemy`, `adjacentAlly`, `opposingUnitThisLane`, `allAllies`, `allEnemies`, `friendlyHero`, `enemyHero`
+- `filters`: `unit`, `hero`, `damaged`
+- `verbs`: `dealDamage`, `heal`, `drawCards`, `summonToken`, `grantStatus`, `modifyAttack`, `modifyHealth`, `destroy`
+- `statuses`: `poisoned`, `stunned`, `shielded`, `burning`
+
+Example authored ability shape:
+
+```ts
+ability(
+  "onPlay",
+  effect.damage(1, target.chosenEnemy()),
+  effect.draw(1, target.friendlyHero())
+)
+```
+
+This renders to:
+
+```text
+On play: Deal 1 damage to chosen enemy. Then Draw 1 card.
+```
+
+## Status Rules
+
+- `poisoned`: unit takes damage equal to stacks at the start of its controller's turn
+- `burning`: unit takes damage equal to stacks at the end of its controller's turn
+- `shielded`: prevents the next damage event, then loses one stack
+- `stunned`: causes the unit to skip its next attack, then loses one stack
+
+## What To Look At
+
+- [`src/game/types.ts`](/Users/henry/ytbn-card-game/src/game/types.ts): core schema for cards, abilities, units, and game state
+- [`src/game/abilities.ts`](/Users/henry/ytbn-card-game/src/game/abilities.ts): semantic helper builders for targets and effects
+- [`src/game/text.ts`](/Users/henry/ytbn-card-game/src/game/text.ts): card text generation from semantic data
+- [`src/game/designer.ts`](/Users/henry/ytbn-card-game/src/game/designer.ts): card-draft helpers, canonical syntax previews, and term override support
+- [`src/game/engine/game.ts`](/Users/henry/ytbn-card-game/src/game/engine/game.ts): turn flow, ability resolution, combat, death handling
+- [`src/game/engine/forecast.ts`](/Users/henry/ytbn-card-game/src/game/engine/forecast.ts): end-of-turn combat forecasting for the UI
+- [`src/game/engine/targeting.ts`](/Users/henry/ytbn-card-game/src/game/engine/targeting.ts): selector and filter resolution
+- [`src/game/engine/ai.ts`](/Users/henry/ytbn-card-game/src/game/engine/ai.ts): simple heuristic AI
+- [`src/data/cards.ts`](/Users/henry/ytbn-card-game/src/data/cards.ts): authored card set
+- [`src/data/decks.ts`](/Users/henry/ytbn-card-game/src/data/decks.ts): fixed starter decks
+- [`src/App.tsx`](/Users/henry/ytbn-card-game/src/App.tsx): single-screen playable UI
+- [`src/ui/CardDesigner.tsx`](/Users/henry/ytbn-card-game/src/ui/CardDesigner.tsx): in-browser card designer with payload export and custom terminology
+- [`src/game/engine/game.test.ts`](/Users/henry/ytbn-card-game/src/game/engine/game.test.ts): engine and text-generation tests
+
+## Notes
+
+- The UI intentionally favors clarity over polish so the semantic model is easy to inspect.
+- The AI is deliberately simple. It tries to make reasonable plays, but the goal here is a demonstrable vertical slice rather than strong strategy.
+- The inspector panel is the clearest proof of the concept: select a card and compare the rendered rules text with the raw ability structure.
