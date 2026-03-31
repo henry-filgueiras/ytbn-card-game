@@ -30,6 +30,8 @@ export function HeroPanel({
       type="button"
       className={`hero-panel${targetable ? " is-targetable" : ""}${selected ? " is-selected" : ""}`}
       onClick={onClick}
+      data-targetable={targetable ? "true" : "false"}
+      data-selected={selected ? "true" : "false"}
     >
       <div className="hero-panel__title">{label}</div>
       <div className="hero-panel__stats">

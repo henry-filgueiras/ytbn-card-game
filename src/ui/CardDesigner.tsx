@@ -213,8 +213,8 @@ export function CardDesigner({ seedCard }: CardDesignerProps) {
   }
 
   return (
-    <section className="designer-panel">
-      <div className="inspector__header">
+    <section className="designer-panel surface-panel" data-surface="designer">
+      <div className="section-heading">
         <h2>Card Designer</h2>
         <div className="designer-panel__header-actions">
           <span>{isOpen ? "Compose payloads and tune terms." : "Collapsed by default to keep gameplay in focus."}</span>

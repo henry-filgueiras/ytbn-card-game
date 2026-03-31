@@ -1,6 +1,6 @@
-# Semantic Lane Duel
+# Semantic Arena Lab
 
-Semantic Lane Duel is a local-only browser prototype for a card game where card language maps directly to structured semantic actions in the engine.
+Semantic Arena Lab is a local-only browser prototype for a card game where card language maps directly to structured semantic actions in the engine.
 
 The important constraint in this project is that rules text is not the source of truth. Cards are authored as structured ability objects, and the same data is used to:
 
@@ -39,6 +39,17 @@ make test
 make build
 ```
 
+## Mode Select
+
+The app now opens on a landing screen with multiple topologies:
+
+- `Lane Duel`: the current fully playable `1v1` mode
+- `Raid Boss Engagement`: a `1v3` commander-style board shell
+- `Triad Skirmish`: a `1v1v1` political triangle
+- `Twinfront Clash`: a `2v2` partner board with a shared center
+
+Right now the duel is fully wired into the live engine. The larger multiplayer layouts load as topology sandboxes with board geometry, semantic remaps, and ritual design notes so we can evolve the engine toward them intentionally.
+
 ## Prototype Rules
 
 - `1v1` match with `3` lanes
@@ -59,6 +70,17 @@ make build
 - Newly played units visibly show `Summoning sickness` during the turn where they cannot attack.
 - The end-turn control is labeled to make it clearer that combat resolves immediately afterward.
 - The card designer starts collapsed so the match UI stays focused until you explicitly open the tool.
+- The landing screen keeps the duel flow stable while also letting you inspect future multiplayer topologies.
+
+## Topology And Ritual Concepts
+
+The non-duel modes are there to pressure-test the semantic language:
+
+- `chosenEnemy`, `adjacentAlly`, and `allEnemies` no longer have one universal meaning once the board is not purely mirrored
+- board topology becomes part of the rules language, not just presentation
+- quick-time / latency-sensitive `ritual windows` are sketched as first-class concepts with canonical syntax and gameplay intent
+
+Those ritual ideas are not implemented in the live duel engine yet. They are presented in the mode side panels as design targets for the next layer of the system.
 
 ## Storyboard
 
@@ -111,8 +133,13 @@ On play: Deal 1 damage to chosen enemy. Then Draw 1 card.
 - [`src/game/engine/ai.ts`](/Users/henry/ytbn-card-game/src/game/engine/ai.ts): simple heuristic AI
 - [`src/data/cards.ts`](/Users/henry/ytbn-card-game/src/data/cards.ts): authored card set
 - [`src/data/decks.ts`](/Users/henry/ytbn-card-game/src/data/decks.ts): fixed starter decks
-- [`src/App.tsx`](/Users/henry/ytbn-card-game/src/App.tsx): single-screen playable UI
+- [`src/App.tsx`](/Users/henry/ytbn-card-game/src/App.tsx): landing flow, playable duel UI, and topology preview routing
+- [`src/game/modes.ts`](/Users/henry/ytbn-card-game/src/game/modes.ts): mode definitions, topology metadata, semantic remaps, and ritual concepts
+- [`src/ui/LandingScreen.tsx`](/Users/henry/ytbn-card-game/src/ui/LandingScreen.tsx): mode-selection landing page
+- [`src/ui/ModeTopologyBoard.tsx`](/Users/henry/ytbn-card-game/src/ui/ModeTopologyBoard.tsx): topology-aware board shells for non-duel modes
+- [`src/ui/ModeConceptPanel.tsx`](/Users/henry/ytbn-card-game/src/ui/ModeConceptPanel.tsx): semantic shift and ritual concept panels
 - [`src/ui/CardDesigner.tsx`](/Users/henry/ytbn-card-game/src/ui/CardDesigner.tsx): in-browser card designer with payload export and custom terminology
+- [`docs/ui-ux-handoff.md`](/Users/henry/ytbn-card-game/docs/ui-ux-handoff.md): UI architecture notes, styling hooks, and handoff guidance for a visual designer
 - [`src/game/engine/game.test.ts`](/Users/henry/ytbn-card-game/src/game/engine/game.test.ts): engine and text-generation tests
 
 ## Notes

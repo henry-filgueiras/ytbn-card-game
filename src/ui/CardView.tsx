@@ -18,6 +18,9 @@ export function CardView({ card, selected = false, disabled = false, onClick, la
       className={`card-view faction-${card.faction}${selected ? " is-selected" : ""}${disabled ? " is-disabled" : ""}`}
       onClick={onClick}
       disabled={disabled}
+      data-faction={card.faction}
+      data-card-kind={card.kind}
+      data-selected={selected ? "true" : "false"}
     >
       <div className="card-view__header">
         <span className="card-view__cost">{card.cost}</span>

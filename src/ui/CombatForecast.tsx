@@ -33,14 +33,14 @@ function outcomeLabel(forecast: CombatForecastItem): string {
 
 export function CombatForecast({ forecasts }: CombatForecastProps) {
   return (
-    <section className="forecast-panel">
-      <div className="inspector__header">
+    <section className="forecast-panel" data-surface="forecast">
+      <div className="section-heading">
         <h2>Combat Forecast</h2>
         <span>Ending the turn resolves on-attack abilities, then lane combat.</span>
       </div>
       <div className="forecast-grid">
         {forecasts.map((forecast) => (
-          <div key={forecast.lane} className={`forecast-card forecast-card--${forecast.kind}`}>
+          <div key={forecast.lane} className={`forecast-card forecast-card--${forecast.kind}`} data-forecast-kind={forecast.kind}>
             <div className="forecast-card__header">
               <strong>{["Left", "Center", "Right"][forecast.lane]} lane</strong>
               <span>{outcomeLabel(forecast)}</span>

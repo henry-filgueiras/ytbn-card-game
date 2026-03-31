@@ -1,5 +1,28 @@
 :root {
-  color: #f5efe0;
+  --color-text-primary: #f5efe0;
+  --color-text-secondary: #d6cfbf;
+  --color-text-muted: #bcae9b;
+  --color-accent-warm: #ff9d48;
+  --color-accent-hot: #ee6446;
+  --color-accent-gold: #ffb55e;
+  --color-accent-verdant: #6ece8a;
+  --color-accent-info: #91c1ff;
+  --color-surface-canvas: #161214;
+  --color-surface-panel: rgba(16, 14, 17, 0.78);
+  --color-surface-soft: rgba(255, 255, 255, 0.04);
+  --color-surface-strong: rgba(13, 11, 13, 0.68);
+  --color-border-subtle: rgba(255, 255, 255, 0.08);
+  --color-border-soft: rgba(255, 255, 255, 0.06);
+  --radius-panel: 20px;
+  --radius-card: 18px;
+  --radius-pill: 999px;
+  --shadow-panel: 0 18px 40px rgba(0, 0, 0, 0.22);
+  --shadow-hero: 0 20px 50px rgba(0, 0, 0, 0.24);
+  --background-app:
+    radial-gradient(circle at top right, rgba(255, 166, 87, 0.18), transparent 28%),
+    radial-gradient(circle at top left, rgba(137, 214, 155, 0.12), transparent 22%),
+    linear-gradient(180deg, #161214 0%, #23181f 54%, #171316 100%);
+  color: var(--color-text-primary);
   background: linear-gradient(180deg, #171314 0%, #241a1f 100%);
   font-family: "Avenir Next", "Segoe UI", sans-serif;
   line-height: 1.4;
@@ -42,10 +65,33 @@ button {
   display: flex;
   flex-direction: column;
   gap: 20px;
-  background:
-    radial-gradient(circle at top right, rgba(255, 166, 87, 0.18), transparent 28%),
-    radial-gradient(circle at top left, rgba(137, 214, 155, 0.12), transparent 22%),
-    linear-gradient(180deg, #161214 0%, #23181f 54%, #171316 100%);
+  background: var(--background-app);
+}
+
+.app-shell[data-scene="landing"] {
+  --background-app:
+    radial-gradient(circle at top right, rgba(255, 166, 87, 0.22), transparent 30%),
+    radial-gradient(circle at center left, rgba(137, 214, 155, 0.16), transparent 24%),
+    linear-gradient(180deg, #161214 0%, #241922 54%, #171316 100%);
+}
+
+.app-shell[data-scene="sandbox"] {
+  --background-app:
+    radial-gradient(circle at top center, rgba(160, 196, 255, 0.16), transparent 24%),
+    radial-gradient(circle at right center, rgba(255, 193, 94, 0.12), transparent 22%),
+    linear-gradient(180deg, #141318 0%, #1e1c26 52%, #141217 100%);
+}
+
+.surface-panel {
+  border-radius: var(--radius-panel);
+  background: var(--color-surface-panel);
+  border: 1px solid var(--color-border-subtle);
+  box-shadow: var(--shadow-panel);
+}
+
+.surface-panel--hero {
+  background: var(--color-surface-strong);
+  box-shadow: var(--shadow-hero);
 }
 
 .topbar {
@@ -53,10 +99,7 @@ button {
   justify-content: space-between;
   gap: 16px;
   padding: 20px 24px;
-  border-radius: 20px;
-  background: rgba(13, 11, 13, 0.68);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.24);
+  border-radius: var(--radius-panel);
 }
 
 .topbar h1 {
@@ -66,7 +109,7 @@ button {
 
 .topbar p {
   margin: 0;
-  color: #d6cfbf;
+  color: var(--color-text-secondary);
   max-width: 60ch;
 }
 
@@ -80,7 +123,7 @@ button {
 
 .deck-chip {
   padding: 10px 14px;
-  border-radius: 999px;
+  border-radius: var(--radius-pill);
   background: rgba(255, 255, 255, 0.08);
   color: #f0e7d3;
 }
@@ -93,7 +136,7 @@ button {
 }
 
 .primary-button {
-  background: linear-gradient(135deg, #ff9d48, #ee6446);
+  background: linear-gradient(135deg, var(--color-accent-warm), var(--color-accent-hot));
   color: #1b0d07;
   font-weight: 700;
 }
@@ -128,10 +171,6 @@ button {
 .inspector,
 .log-panel {
   padding: 20px;
-  border-radius: 20px;
-  background: rgba(16, 14, 17, 0.78);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.22);
 }
 
 .status-bar {
@@ -143,6 +182,26 @@ button {
   border-radius: 16px;
   background: rgba(255, 255, 255, 0.04);
   color: #e7dec7;
+}
+
+.section-heading,
+.hand-panel__header,
+.inspector__header {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  align-items: baseline;
+  flex-wrap: wrap;
+}
+
+.section-heading h2,
+.hand-panel__header h2,
+.inspector__header h2 {
+  margin: 0;
+}
+
+.section-heading span {
+  color: var(--color-text-muted);
 }
 
 .winner-banner {
@@ -362,19 +421,6 @@ button {
   display: flex;
   flex-direction: column;
   gap: 14px;
-}
-
-.hand-panel__header,
-.inspector__header {
-  display: flex;
-  justify-content: space-between;
-  gap: 8px;
-  align-items: baseline;
-}
-
-.hand-panel__header h2,
-.inspector__header h2 {
-  margin: 0;
 }
 
 .hand-grid {
@@ -665,6 +711,352 @@ button {
     rgba(255, 255, 255, 0.04);
 }
 
+.landing-layout {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.landing-hero {
+  padding: 24px;
+  border-radius: 24px;
+  background:
+    radial-gradient(circle at top right, rgba(255, 148, 88, 0.16), transparent 34%),
+    radial-gradient(circle at left center, rgba(112, 204, 137, 0.12), transparent 28%),
+    rgba(16, 14, 17, 0.78);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.22);
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.landing-kicker {
+  display: inline-flex;
+  padding: 6px 10px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.08);
+  color: #f7ddae;
+  font-size: 0.84rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.landing-hero__copy h2 {
+  margin: 14px 0 12px;
+  font-size: 2rem;
+  max-width: 18ch;
+}
+
+.landing-hero__copy p {
+  margin: 0;
+  max-width: 68ch;
+  color: #ddd2bf;
+}
+
+.landing-pillars,
+.mode-feature-grid,
+.ritual-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 12px;
+}
+
+.landing-pillar,
+.mode-feature-card,
+.ritual-card {
+  padding: 16px;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.landing-pillar span,
+.mode-feature-card span {
+  color: #d6cbba;
+}
+
+.mode-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 16px;
+}
+
+.mode-card {
+  padding: 20px;
+  border-radius: 22px;
+  background: rgba(16, 14, 17, 0.82);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.22);
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.mode-card--playable {
+  background:
+    linear-gradient(180deg, rgba(255, 149, 81, 0.08), transparent 28%),
+    rgba(16, 14, 17, 0.82);
+}
+
+.mode-card__header,
+.mode-card__eyebrow,
+.topology-seat__header,
+.ritual-card__header {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.mode-card__header {
+  align-items: flex-start;
+}
+
+.mode-card__header h3 {
+  margin: 10px 0 6px;
+}
+
+.mode-card__header p,
+.mode-card__description {
+  margin: 0;
+  color: #d8ccba;
+}
+
+.mode-card__eyebrow {
+  flex-wrap: wrap;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: #cdbda7;
+}
+
+.mode-card__status,
+.topology-seat__badge {
+  padding: 8px 10px;
+  border-radius: 999px;
+  font-size: 0.8rem;
+  white-space: nowrap;
+}
+
+.mode-card__status--playable,
+.topology-seat__badge--ally {
+  background: rgba(110, 206, 138, 0.16);
+  color: #c8f1d0;
+}
+
+.mode-card__status--topologyPreview,
+.topology-seat__badge--rival {
+  background: rgba(255, 255, 255, 0.1);
+  color: #efe4d1;
+}
+
+.topology-seat__badge--enemy {
+  background: rgba(255, 123, 90, 0.16);
+  color: #ffd0c4;
+}
+
+.topology-seat__badge--boss {
+  background: rgba(255, 180, 94, 0.16);
+  color: #ffe0af;
+}
+
+.mode-card__preview {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 10px;
+}
+
+.mode-card__seat {
+  padding: 12px;
+  border-radius: 14px;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.mode-card__seat strong {
+  font-size: 0.92rem;
+}
+
+.mode-card__seat span {
+  color: #d9cebc;
+  font-size: 0.82rem;
+}
+
+.mode-card__seat--ally {
+  border-color: rgba(110, 206, 138, 0.2);
+}
+
+.mode-card__seat--enemy {
+  border-color: rgba(255, 123, 90, 0.2);
+}
+
+.mode-card__seat--boss {
+  border-color: rgba(255, 189, 104, 0.28);
+}
+
+.mode-card__seat--rival {
+  border-color: rgba(160, 196, 255, 0.2);
+}
+
+.mode-card__highlights,
+.concept-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.mode-card__highlight,
+.concept-card {
+  padding: 14px;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.mode-card__highlight span,
+.concept-card__copy span,
+.ritual-note {
+  color: #d7ccbb;
+}
+
+.topology-board {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.topology-board__section {
+  padding: 18px;
+  border-radius: 18px;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  background: rgba(255, 255, 255, 0.04);
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.topology-board__section--boss {
+  background:
+    linear-gradient(180deg, rgba(255, 165, 92, 0.12), transparent 36%),
+    rgba(255, 255, 255, 0.04);
+}
+
+.topology-board__section--shared {
+  background:
+    linear-gradient(180deg, rgba(117, 212, 143, 0.1), transparent 36%),
+    rgba(255, 255, 255, 0.04);
+}
+
+.topology-board__section-header {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.topology-board__section-header span,
+.topology-seat__meta,
+.topology-seat__note,
+.concept-card__copy span,
+.ritual-card p,
+.ritual-card__tension {
+  color: #d4c8b8;
+}
+
+.topology-board__seat-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 12px;
+}
+
+.topology-seat {
+  padding: 16px;
+  border-radius: 18px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(10, 10, 12, 0.32);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.topology-seat--ally {
+  border-color: rgba(110, 206, 138, 0.2);
+}
+
+.topology-seat--enemy {
+  border-color: rgba(255, 123, 90, 0.2);
+}
+
+.topology-seat--boss {
+  border-color: rgba(255, 189, 104, 0.3);
+}
+
+.topology-seat--rival {
+  border-color: rgba(160, 196, 255, 0.22);
+}
+
+.topology-seat__deck {
+  font-size: 0.86rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #f7ddae;
+}
+
+.topology-seat__note {
+  margin: 0;
+}
+
+.topology-seat__lanes {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
+  gap: 8px;
+}
+
+.topology-lane,
+.ritual-card__syntax {
+  padding: 10px 12px;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  color: #f1e6d6;
+}
+
+.concept-card__term {
+  font-family: "SFMono-Regular", "Menlo", monospace;
+  color: #f8dda6;
+}
+
+.concept-card__copy {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.ritual-note {
+  padding: 14px;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.ritual-card__header span {
+  color: #f7ddae;
+  font-size: 0.84rem;
+}
+
+.ritual-card p {
+  margin: 0;
+}
+
 @media (max-width: 1120px) {
   .layout {
     grid-template-columns: 1fr;
@@ -678,7 +1070,12 @@ button {
 
   .topbar,
   .status-bar,
-  .controls-row {
+  .controls-row,
+  .mode-card__header,
+  .mode-card__eyebrow,
+  .topology-board__section-header,
+  .topology-seat__header,
+  .ritual-card__header {
     flex-direction: column;
   }
 
@@ -686,6 +1083,7 @@ button {
     grid-template-columns: 1fr;
   }
 
+  .mode-grid,
   .hand-grid {
     grid-template-columns: 1fr;
   }

@@ -26,6 +26,10 @@ export function BoardUnit({ unit, selected = false, targetable = false, badges =
       type="button"
       className={`board-unit faction-${card.faction}${selected ? " is-selected" : ""}${targetable ? " is-targetable" : ""}`}
       onClick={onClick}
+      data-faction={card.faction}
+      data-owner={unit.ownerId}
+      data-selected={selected ? "true" : "false"}
+      data-targetable={targetable ? "true" : "false"}
     >
       <div className="board-unit__name">{unit.name}</div>
       <div className="board-unit__stats">

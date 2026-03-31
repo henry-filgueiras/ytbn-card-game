@@ -1,13 +1,11 @@
 import { useEffect, useMemo, useState } from "react";
 import { getCardById } from "./data/cards";
 import { getDeckById } from "./data/decks";
-import { renderCardRules, renderTarget } from "./game/text";
 import {
   createGame,
   endTurn,
   getBoardCard,
   getCombatForecast,
-  getLaneCount,
   getPlayPreview,
   heroEntityId,
   playCard,
@@ -15,12 +13,13 @@ import {
   shouldAutoEndTurn,
   unitEntityId
 } from "./game/engine";
-import type { CardDefinition } from "./game/types";
-import { BoardUnit } from "./ui/BoardUnit";
-import { CardView } from "./ui/CardView";
-import { CardDesigner } from "./ui/CardDesigner";
-import { CombatForecast } from "./ui/CombatForecast";
-import { HeroPanel } from "./ui/HeroPanel";
+import { GAME_MODES, getGameModeById, type GameModeId } from "./game/modes";
+import { renderTarget } from "./game/text";
+import { AppHeader } from "./ui/AppHeader";
+import { DuelBoard } from "./ui/DuelBoard";
+import { DuelSidebar } from "./ui/DuelSidebar";
+import { LandingScreen } from "./ui/LandingScreen";
+import { ModeSandboxView } from "./ui/ModeSandboxView";
 
 interface InspectSelection {
   cardId?: string;
@@ -44,22 +43,30 @@ function winnerLabel(winner: ReturnType<typeof createGame>["winner"]): string {
 }
 
 export default function App() {
+  const [activeModeId, setActiveModeId] = useState<GameModeId | null>(null);
   const [game, setGame] = useState(() => createGame());
   const [selectedHandIndex, setSelectedHandIndex] = useState<number | null>(null);
   const [selectedLane, setSelectedLane] = useState<number | null>(null);
   const [inspection, setInspection] = useState<InspectSelection>({});
 
+  const activeMode = activeModeId ? getGameModeById(activeModeId) : null;
+  const scene = !activeMode ? "landing" : activeMode.id === "duel" ? "duel" : "sandbox";
+  const isDuelMode = scene === "duel";
+  const playableModeCount = GAME_MODES.filter((mode) => mode.support === "playable").length;
+
   const selectedCardId =
-    selectedHandIndex != null ? game.players.player.hand[selectedHandIndex] ?? undefined : inspection.cardId;
+    isDuelMode && selectedHandIndex != null ? game.players.player.hand[selectedHandIndex] ?? undefined : inspection.cardId;
   const selectedCard = selectedCardId ? getCardById(selectedCardId) : null;
-  const selectedBoardCard = inspection.entityId ? getBoardCard(game, inspection.entityId) : null;
+  const selectedBoardCard = isDuelMode && inspection.entityId ? getBoardCard(game, inspection.entityId) : null;
   const inspectedCard = selectedCard ?? selectedBoardCard ?? null;
 
   const preview =
-    selectedHandIndex != null ? getPlayPreview(game, "player", selectedHandIndex, selectedLane ?? undefined) : null;
+    isDuelMode && selectedHandIndex != null
+      ? getPlayPreview(game, "player", selectedHandIndex, selectedLane ?? undefined)
+      : null;
 
   useEffect(() => {
-    if (selectedHandIndex == null) {
+    if (!isDuelMode || selectedHandIndex == null) {
       return;
     }
 
@@ -69,10 +76,10 @@ export default function App() {
       setSelectedHandIndex(null);
       setSelectedLane(null);
     }
-  }, [game, selectedHandIndex]);
+  }, [game, isDuelMode, selectedHandIndex]);
 
   useEffect(() => {
-    if (game.currentPlayer !== "ai" || game.winner) {
+    if (!isDuelMode || game.currentPlayer !== "ai" || game.winner) {
       return;
     }
 
@@ -81,13 +88,16 @@ export default function App() {
     }, 700);
 
     return () => window.clearTimeout(timeout);
-  }, [game.currentPlayer, game.turnNumber, game.winner]);
+  }, [game.currentPlayer, game.turnNumber, game.winner, isDuelMode]);
 
   const targetableIds = useMemo(() => new Set(preview?.targetOptions ?? []), [preview?.targetOptions]);
-  const laneCount = getLaneCount();
-  const combatForecast = useMemo(() => getCombatForecast(game, game.currentPlayer), [game]);
+  const combatForecast = useMemo(() => (isDuelMode ? getCombatForecast(game, game.currentPlayer) : []), [game, isDuelMode]);
 
   const prompt = useMemo(() => {
+    if (!isDuelMode) {
+      return activeMode?.modeNote ?? "";
+    }
+
     if (game.winner) {
       return `${winnerLabel(game.winner)}. Start a new match to play again.`;
     }
@@ -113,33 +123,55 @@ export default function App() {
     }
 
     return `${selectedCard.name} is ready to play.`;
-  }, [game.currentPlayer, game.winner, preview, selectedCard, selectedLane]);
+  }, [activeMode, game.currentPlayer, game.winner, isDuelMode, preview, selectedCard, selectedLane]);
 
-  function resetMatch() {
-    setGame(createGame());
+  function clearSelectionState() {
     setSelectedHandIndex(null);
     setSelectedLane(null);
     setInspection({});
   }
 
+  function openMode(modeId: GameModeId) {
+    setActiveModeId(modeId);
+    clearSelectionState();
+
+    if (modeId === "duel") {
+      setGame(createGame());
+    }
+  }
+
+  function returnToModeSelect() {
+    setActiveModeId(null);
+    clearSelectionState();
+  }
+
+  function resetMatch() {
+    if (!isDuelMode) {
+      return;
+    }
+
+    setGame(createGame());
+    clearSelectionState();
+  }
+
   function commitPlay(options?: { targetId?: string; lane?: number }) {
-    if (selectedHandIndex == null) {
+    if (!isDuelMode || selectedHandIndex == null) {
       return;
     }
 
     let next = playCard(game, "player", {
-        handIndex: selectedHandIndex,
-        lane: options?.lane ?? selectedLane ?? undefined,
-        targetId: options?.targetId
-      });
+      handIndex: selectedHandIndex,
+      lane: options?.lane ?? selectedLane ?? undefined,
+      targetId: options?.targetId
+    });
 
-      if (next === game) {
-        return;
-      }
+    if (next === game) {
+      return;
+    }
 
-      if (shouldAutoEndTurn(next, "player")) {
-        next = endTurn(next);
-      }
+    if (shouldAutoEndTurn(next, "player")) {
+      next = endTurn(next);
+    }
 
     setGame(next);
     setSelectedHandIndex(null);
@@ -147,7 +179,7 @@ export default function App() {
   }
 
   function handleHandCardClick(handIndex: number) {
-    if (game.currentPlayer !== "player" || game.winner) {
+    if (!isDuelMode || game.currentPlayer !== "player" || game.winner) {
       return;
     }
 
@@ -165,6 +197,10 @@ export default function App() {
   }
 
   function handleLaneClick(ownerId: "player" | "ai", lane: number) {
+    if (!isDuelMode) {
+      return;
+    }
+
     const occupant = game.players[ownerId].lanes[lane];
 
     if (occupant) {
@@ -206,6 +242,10 @@ export default function App() {
   }
 
   function handleHeroClick(playerId: "player" | "ai") {
+    if (!isDuelMode) {
+      return;
+    }
+
     const entityId = heroEntityId(playerId);
     setInspection({ entityId });
 
@@ -215,231 +255,97 @@ export default function App() {
   }
 
   function playSelectedSpell() {
-    if (!selectedCard || selectedCard.kind !== "spell" || !preview || preview.requiresTarget || !preview.playable) {
+    if (!isDuelMode || !selectedCard || selectedCard.kind !== "spell" || !preview || preview.requiresTarget || !preview.playable) {
       return;
     }
 
     commitPlay();
   }
 
+  if (!activeMode) {
+    return (
+      <div className="app-shell" data-scene={scene}>
+        <AppHeader
+          title="Semantic Arena Lab"
+          description="One semantic card language, multiple board topologies. Use the playable duel to test the rules engine, then open the larger modes to explore how the same terms bend under new spatial assumptions."
+          badge={`${playableModeCount} live mode · ${GAME_MODES.length - playableModeCount} topology sandboxes`}
+          scene="landing"
+        />
+        <LandingScreen onSelectMode={openMode} />
+      </div>
+    );
+  }
+
+  if (!isDuelMode) {
+    return (
+      <div className="app-shell" data-scene={scene}>
+        <AppHeader
+          title={activeMode.name}
+          description={activeMode.description}
+          badge={`${activeMode.playerCountLabel} · ${activeMode.topologyLabel}`}
+          scene="sandbox"
+          actions={
+            <>
+              <button type="button" className="secondary-button" onClick={returnToModeSelect}>
+                Change Mode
+              </button>
+              <button type="button" className="primary-button" onClick={() => openMode("duel")}>
+                Jump Into Duel
+              </button>
+            </>
+          }
+        />
+        <ModeSandboxView mode={activeMode} />
+      </div>
+    );
+  }
+
   return (
-    <div className="app-shell">
-      <header className="topbar">
-        <div>
-          <h1>Semantic Lane Duel</h1>
-          <p>
-            Cards are authored as structured abilities and rendered into language that the engine also resolves.
-          </p>
-        </div>
-        <div className="topbar__actions">
-          <div className="deck-chip">
-            You: {getDeckById("emberRush").name} vs AI: {getDeckById("verdantWard").name}
-          </div>
-          <button type="button" className="primary-button" onClick={resetMatch}>
-            New Match
-          </button>
-        </div>
-      </header>
-
-      <main className="layout">
-        <section className="table-panel">
-          <div className="status-bar">
-            <div>
-              <strong>Turn {game.turnNumber}</strong> · {game.currentPlayer === "player" ? "Your turn" : "AI turn"}
-            </div>
-            <div>{prompt}</div>
-          </div>
-
-          {game.winner ? <div className="winner-banner">{winnerLabel(game.winner)}</div> : null}
-
-          <HeroPanel
-            label="AI Hero"
-            health={game.players.ai.hero.health}
-            maxHealth={game.players.ai.hero.maxHealth}
-            deckCount={game.players.ai.deck.length}
-            handCount={game.players.ai.hand.length}
-            discardCount={game.players.ai.discard.length}
-            targetable={targetableIds.has(heroEntityId("ai"))}
-            selected={inspection.entityId === heroEntityId("ai")}
-            onClick={() => handleHeroClick("ai")}
-          />
-
-          <div className="lane-grid">
-            {Array.from({ length: laneCount }, (_, lane) => {
-              const aiUnit = game.players.ai.lanes[lane];
-              const playerUnit = game.players.player.lanes[lane];
-              const laneIsSelectable =
-                selectedCard?.kind === "unit" &&
-                selectedHandIndex != null &&
-                game.currentPlayer === "player" &&
-                !game.players.player.lanes[lane];
-
-              return (
-                <div key={lane} className={`lane-column${selectedLane === lane ? " is-selected" : ""}`}>
-                  <div className="lane-slot" onClick={() => handleLaneClick("ai", lane)} role="presentation">
-                    {aiUnit ? (
-                      <BoardUnit
-                        unit={aiUnit}
-                        selected={inspection.entityId === unitEntityId(aiUnit.instanceId)}
-                        targetable={targetableIds.has(unitEntityId(aiUnit.instanceId))}
-                        badges={
-                          game.currentPlayer === "ai" && aiUnit.summonedOnTurn === game.turnNumber
-                            ? ["Summoning sickness"]
-                            : []
-                        }
-                        onClick={() => handleLaneClick("ai", lane)}
-                      />
-                    ) : (
-                      <div className="lane-slot__empty">Open enemy lane</div>
-                    )}
-                  </div>
-
-                  <div className="lane-column__label">{["Left", "Center", "Right"][lane]} lane</div>
-
-                  <div className={`lane-slot${laneIsSelectable ? " lane-slot--playable" : ""}`} onClick={() => handleLaneClick("player", lane)} role="presentation">
-                    {playerUnit ? (
-                      <BoardUnit
-                        unit={playerUnit}
-                        selected={inspection.entityId === unitEntityId(playerUnit.instanceId)}
-                        targetable={targetableIds.has(unitEntityId(playerUnit.instanceId))}
-                        badges={
-                          game.currentPlayer === "player" && playerUnit.summonedOnTurn === game.turnNumber
-                            ? ["Summoning sickness"]
-                            : []
-                        }
-                        onClick={() => handleLaneClick("player", lane)}
-                      />
-                    ) : (
-                      <div className="lane-slot__empty">{laneIsSelectable ? "Click to deploy here" : "Open allied lane"}</div>
-                    )}
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-
-          <HeroPanel
-            label="Your Hero"
-            health={game.players.player.hero.health}
-            maxHealth={game.players.player.hero.maxHealth}
-            energy={game.players.player.energy}
-            maxEnergy={game.players.player.maxEnergy}
-            deckCount={game.players.player.deck.length}
-            handCount={game.players.player.hand.length}
-            discardCount={game.players.player.discard.length}
-            targetable={targetableIds.has(heroEntityId("player"))}
-            selected={inspection.entityId === heroEntityId("player")}
-            onClick={() => handleHeroClick("player")}
-          />
-
-          <div className="controls-row">
-            <button
-              type="button"
-              className="primary-button"
-              onClick={playSelectedSpell}
-              disabled={!selectedCard || selectedCard.kind !== "spell" || !preview || preview.requiresTarget || !preview.playable}
-            >
-              Play Selected Spell
+    <div className="app-shell" data-scene={scene}>
+      <AppHeader
+        title="Semantic Arena Lab"
+        description={activeMode.description}
+        badge={`Mode: ${activeMode.name} · You: ${getDeckById("emberRush").name} vs AI: ${getDeckById("verdantWard").name}`}
+        scene="duel"
+        actions={
+          <>
+            <button type="button" className="secondary-button" onClick={returnToModeSelect}>
+              Change Mode
             </button>
-            <button
-              type="button"
-              className="secondary-button"
-              onClick={() => {
-                setSelectedHandIndex(null);
-                setSelectedLane(null);
-              }}
-              disabled={selectedHandIndex == null}
-            >
-              Clear Selection
+            <button type="button" className="primary-button" onClick={resetMatch}>
+              New Match
             </button>
-            <button
-              type="button"
-              className="secondary-button"
-              onClick={() => {
-                setSelectedHandIndex(null);
-                setSelectedLane(null);
-                setGame((current) => endTurn(current));
-              }}
-              disabled={game.currentPlayer !== "player" || Boolean(game.winner)}
-            >
-              End Turn & Resolve Combat
-            </button>
-          </div>
+          </>
+        }
+      />
 
-          <CombatForecast forecasts={combatForecast} />
+      <main className="layout" data-scene="duel">
+        <DuelBoard
+          game={game}
+          prompt={prompt}
+          selectedHandIndex={selectedHandIndex}
+          selectedLane={selectedLane}
+          selectedCard={selectedCard}
+          preview={preview}
+          inspectionEntityId={inspection.entityId}
+          targetableIds={targetableIds}
+          combatForecast={combatForecast}
+          onHeroClick={handleHeroClick}
+          onLaneClick={handleLaneClick}
+          onHandCardClick={handleHandCardClick}
+          onPlaySelectedSpell={playSelectedSpell}
+          onClearSelection={() => {
+            setSelectedHandIndex(null);
+            setSelectedLane(null);
+          }}
+          onEndTurn={() => {
+            setSelectedHandIndex(null);
+            setSelectedLane(null);
+            setGame((current) => endTurn(current));
+          }}
+        />
 
-          <section className="hand-panel">
-            <div className="hand-panel__header">
-              <h2>Your Hand</h2>
-              <span>{game.players.player.hand.length} cards</span>
-            </div>
-            <div className="hand-grid">
-              {game.players.player.hand.map((cardId, handIndex) => (
-                <CardView
-                  key={`${cardId}-${handIndex}`}
-                  card={getCardById(cardId)}
-                  selected={selectedHandIndex === handIndex}
-                  disabled={game.currentPlayer !== "player" || Boolean(game.winner)}
-                  onClick={() => handleHandCardClick(handIndex)}
-                  label={selectedHandIndex === handIndex ? "Selected" : undefined}
-                />
-              ))}
-            </div>
-          </section>
-        </section>
-
-        <aside className="side-panel">
-          <section className="inspector">
-            <div className="inspector__header">
-              <h2>Inspector</h2>
-              <span>Rendered rules + semantic data</span>
-            </div>
-
-            {inspectedCard ? (
-              <>
-                <div className={`inspector-card faction-${inspectedCard.faction}`}>
-                  <div className="inspector-card__title">
-                    <div>
-                      <strong>{inspectedCard.name}</strong>
-                      <div className="inspector-card__meta">
-                        {inspectedCard.kind === "unit"
-                          ? `${inspectedCard.attack}/${inspectedCard.health} unit`
-                          : "spell"}{" "}
-                        · cost {inspectedCard.cost}
-                      </div>
-                    </div>
-                    <span>{inspectedCard.faction}</span>
-                  </div>
-                  <div className="inspector-card__rules">
-                    {renderCardRules(inspectedCard).map((rule) => (
-                      <div key={rule}>{rule}</div>
-                    ))}
-                  </div>
-                </div>
-
-                <pre className="semantic-json">{JSON.stringify(inspectedCard, null, 2)}</pre>
-              </>
-            ) : (
-              <div className="empty-panel">Select a card in hand or a unit on the board to inspect it.</div>
-            )}
-          </section>
-
-          <CardDesigner seedCard={inspectedCard} />
-
-          <section className="log-panel">
-            <div className="inspector__header">
-              <h2>Event Log</h2>
-              <span>Most recent events first</span>
-            </div>
-            <div className="log-entries">
-              {[...game.log].reverse().map((entry, index) => (
-                <div key={`${entry}-${index}`} className="log-entry">
-                  {entry}
-                </div>
-              ))}
-            </div>
-          </section>
-        </aside>
+        <DuelSidebar inspectedCard={inspectedCard} logEntries={game.log} />
       </main>
     </div>
   );
